@@ -1,8 +1,8 @@
 import { strict as assert } from 'node:assert';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 import { copyRepository } from './repository-fixture.ts';
 
@@ -40,6 +40,42 @@ async function lintProof(directory: string) {
   assert.match(output, /no-explicit-any/u);
   assert.match(output, /no-floating-promises/u);
   await Promise.all(paths.map((path) => rm(join(directory, path))));
+}
+
+async function architectureProof(directory: string) {
+  const cases = [
+    {
+      path: 'src/cli/qmd-probe.ts',
+      module: '@tobilu/qmd',
+      name: 'createStore',
+    },
+    {
+      path: 'src/documents/io-probe.ts',
+      module: 'node:fs/promises',
+      name: 'readFile',
+    },
+    { path: 'src/cli-import-probe.ts', module: './cli/run.ts', name: 'runCli' },
+    {
+      path: 'src/search/private-probe.ts',
+      module: '@tobilu/qmd/dist/index.js',
+      name: 'createStore',
+    },
+  ];
+  await Promise.all(
+    cases.map(async ({ path, module, name }) => {
+      await mkdir(dirname(join(directory, path)), { recursive: true });
+      await writeFile(
+        join(directory, path),
+        `import { ${name} } from '${module}';\nexport const probe = ${name};\n`
+      );
+    })
+  );
+  for (const { path } of cases) {
+    const output = fails(directory, 'node_modules/oxlint/bin/oxlint', [path]);
+    assert.match(output, /no-restricted-imports/u);
+    assert.ok(output.includes(path), output);
+  }
+  await Promise.all(cases.map(({ path }) => rm(join(directory, path))));
 }
 
 async function typeAndKnipProof(directory: string) {
@@ -117,6 +153,7 @@ const directory = await mkdtemp(join(tmpdir(), 'agent-wiki-tooling-'));
 try {
   await copyRepository(directory);
   await lintProof(directory);
+  await architectureProof(directory);
   await typeAndKnipProof(directory);
   await runnerProof(directory);
   console.log(

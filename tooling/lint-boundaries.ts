@@ -2,19 +2,19 @@ import type { OxlintOverride } from 'oxlint';
 
 export const boundaries: OxlintOverride[] = [
   {
-    files: ['src/cli/**/*.ts'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        { patterns: ['bun', 'bun:*', '@tobilu/qmd', '@tobilu/qmd/*'] },
-      ],
-    },
-  },
-  {
     files: ['**/*.ts'],
     rules: {
       'no-restricted-globals': ['error', 'Bun'],
       'no-restricted-imports': ['error', { patterns: ['bun', 'bun:*'] }],
+    },
+  },
+  {
+    files: ['src/cli/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: ['bun', 'bun:*', '@tobilu/qmd', '@tobilu/qmd/**'] },
+      ],
     },
   },
   {
@@ -28,7 +28,7 @@ export const boundaries: OxlintOverride[] = [
             'bun',
             'bun:*',
             '@tobilu/qmd',
-            '@tobilu/qmd/*',
+            '@tobilu/qmd/**',
             '**/cli/**',
           ],
         },
@@ -40,7 +40,7 @@ export const boundaries: OxlintOverride[] = [
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: ['bun', 'bun:*', '**/cli/**'] },
+        { patterns: ['bun', 'bun:*', '**/cli/**', '@tobilu/qmd/**'] },
       ],
     },
   },
@@ -55,6 +55,7 @@ export const boundaries: OxlintOverride[] = [
             'bun',
             'bun:*',
             '@tobilu/qmd',
+            '@tobilu/qmd/**',
             '**/cli/**',
             'node:fs',
             'node:fs/*',
