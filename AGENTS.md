@@ -18,7 +18,6 @@ Before implementing, read:
 The format and CLI specifications define product behavior. The tooling policy
 defines quality requirements; executable configs and scripts must enforce it.
 Architecture sketches guide boundaries without fixing every filename or helper API.
-The pinned Charlie snapshot is reference data, not a separate set of instructions.
 
 ## Constraints
 

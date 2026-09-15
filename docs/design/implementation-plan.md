@@ -10,8 +10,7 @@ This document is technical guidance, not a second work tracker.
 
 Create a single TypeScript ESM package with library and CLI entrypoints, explicit
 exports, declarations, and a local package-consumer smoke test. Implement the
-complete [tooling policy](../contributing/tooling.md) from the start, adapting the
-[pinned Charlie configuration](references/charlie-tooling.md). Keep tests, scripts,
+complete [tooling policy](../contributing/tooling.md) from the start. Keep tests, scripts,
 and config code within the same type and size/complexity rules as production code.
 
 Choose and pin compatible Node, Bun, TypeScript, Oxlint/type-aware engine, Oxfmt,

@@ -60,15 +60,14 @@ explicit search indexing, and moves that update references.
 Start with [CONTRIBUTING.md](CONTRIBUTING.md). Agents should also read
 [AGENTS.md](AGENTS.md).
 
-| Document                                                               | Authority                                                                 |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [Document format](docs/design/document-format.md)                      | Supported authored content and validation rules.                          |
-| [CLI specification](docs/design/cli-spec.md)                           | Commands, flags, root discovery, and observable behavior.                 |
-| [Architecture](docs/design/architecture.md)                            | Models, component boundaries, parsing, graph, QMD, and failure handling.  |
-| [Implementation plan](docs/design/implementation-plan.md)              | Technical sequence, integration prerequisites, and verification approach. |
-| [Conformance](docs/design/conformance.md)                              | Durable behavioral scenarios to turn into tests.                          |
-| [Tooling policy](docs/contributing/tooling.md)                         | Strict types, lint, format, Knip, coverage, hooks, packaging, and CI.     |
-| [Charlie tooling reference](docs/design/references/charlie-tooling.md) | Pinned upstream configuration snapshot to adapt under the tooling policy. |
+| Document                                                  | Authority                                                                 |
+| --------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Document format](docs/design/document-format.md)         | Supported authored content and validation rules.                          |
+| [CLI specification](docs/design/cli-spec.md)              | Commands, flags, root discovery, and observable behavior.                 |
+| [Architecture](docs/design/architecture.md)               | Models, component boundaries, parsing, graph, QMD, and failure handling.  |
+| [Implementation plan](docs/design/implementation-plan.md) | Technical sequence, integration prerequisites, and verification approach. |
+| [Conformance](docs/design/conformance.md)                 | Durable behavioral scenarios to turn into tests.                          |
+| [Tooling policy](docs/contributing/tooling.md)            | Strict types, lint, format, Knip, coverage, hooks, packaging, and CI.     |
 
 [The Agent Wiki Linear project](https://linear.app/tomasekio/project/agent-wiki-fc8efac8c2ef)
 owns implementation issues, dependencies, priorities, and delivery status.

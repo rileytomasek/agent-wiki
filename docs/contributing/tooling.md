@@ -1,13 +1,11 @@
 # Agent Wiki Repository Setup and Code Quality
 
-Agreed repository and quality policy for the [Agent Wiki architecture](../design/architecture.md). This captures setup decisions; it does not mean the repository, hooks, or CI have been implemented.
-
-Reuse the strict tooling configuration from `charlie-labs/charlie-system`, using commit `811f58007c79f6426c14886dd6c069fbd901f670` as the reviewed baseline. Preserve its lint and type-safety rules while adapting repository paths, Node packaging, and test infrastructure. The [local baseline snapshot](../design/references/charlie-tooling.md) contains the reviewed configurations so implementation does not require access to the upstream repository.[^baseline]
+Repository and quality policy for the [Agent Wiki architecture](../design/architecture.md). The [package scripts](../../package.json), [TypeScript configuration](../../tsconfig.json), [Oxlint configuration](../../oxlint.config.ts), and [complete lint rule set](../../tooling/lint-rules.ts) enforce these requirements.
 
 ## Repository and runtime
 
 - Start with one TypeScript package containing the reusable library and the `wiki` executable. Use ESM and ship compiled JavaScript plus TypeScript declarations for Node.
-- Use Bun for dependency management and package-script invocation. Keep a committed `bun.lock`, frozen CI installs with `bun ci`, the isolated linker, and the baseline's 48-hour minimum dependency release age.
+- Use Bun for dependency management and package-script invocation. Keep a committed `bun.lock`, frozen CI installs with `bun ci`, the isolated linker, and a 48-hour minimum dependency release age.
 - Pin a compatible set of Node, Bun, TypeScript, Oxlint, its type-aware engine, Oxfmt, Knip, and test-tool versions. Select the supported Node range together with the actual QMD build; test the minimum supported version and the development version.
 - Keep Bun APIs and ambient Bun types out of shipped code. Consumers must not need Bun, Husky, or other development tools to use the package.
 - Declare explicit package `exports`, `bin`, `types`, and `files` entries. Use a straightforward TypeScript build; no monorepo, build orchestrator, or release framework is needed initially.
@@ -15,22 +13,22 @@ Reuse the strict tooling configuration from `charlie-labs/charlie-system`, using
 
 ## Tooling choices
 
-| Area                         | Decision                                                                                                                  |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Type checking                | TypeScript with Charlie's strict checks, additional checks listed below, and Node-compatible module resolution.           |
-| Lint                         | Oxlint with type-aware rules and `oxlint-tsgolint`; retain the strict baseline, including all size and complexity limits. |
-| Formatting                   | Oxfmt and `.editorconfig`, retaining the baseline style and import/package sorting.                                       |
-| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints.                        |
-| Tests                        | Vitest running on Node, with V8 coverage. Bun may invoke the script, but is not the test runtime.                         |
-| Property tests               | `fast-check`, reusing Flywheel's approach of replayable seeds and minimized counterexamples.                              |
-| Local hooks                  | Husky and lint-staged: staged fixes on commit, full checks before push.                                                   |
-| CI                           | GitHub Actions with required checks, a reproducible install, coverage enforcement, and Linux/macOS package verification.  |
+| Area                         | Decision                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Type checking                | TypeScript with the strict checks listed below and Node-compatible module resolution.                                    |
+| Lint                         | Oxlint with type-aware rules and `oxlint-tsgolint`; enforce all strict rules, including size and complexity limits.      |
+| Formatting                   | Oxfmt and `.editorconfig`, with the style defined below and import/package sorting.                                      |
+| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints.                       |
+| Tests                        | Vitest running on Node, with V8 coverage. Bun may invoke the script, but is not the test runtime.                        |
+| Property tests               | `fast-check` with replayable seeds and minimized counterexamples.                                                        |
+| Local hooks                  | Husky and lint-staged: staged fixes on commit, full checks before push.                                                  |
+| CI                           | GitHub Actions with required checks, a reproducible install, coverage enforcement, and Linux/macOS package verification. |
 
-Do not introduce a second formatter or linter alongside Oxfmt/Oxlint. The principal change from Charlie's tool stack is replacing `bun:test` with Vitest to test the intended Node runtime and enforce coverage across all production source, including unimported files and branches.[^vitest]
+Do not introduce a second formatter or linter alongside Oxfmt/Oxlint. Use Vitest to test the intended Node runtime and enforce coverage across all production source, including unimported files and branches.[^vitest]
 
 ## TypeScript policy
 
-Retain `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, and `noFallthroughCasesInSwitch` from the baseline. Add:
+Enable `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, and `noFallthroughCasesInSwitch`, along with:
 
 - `noImplicitReturns`
 - `noImplicitOverride`
@@ -39,7 +37,7 @@ Retain `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, and `
 - `noUnusedParameters`
 - `verbatimModuleSyntax`
 
-Use `module: "NodeNext"`, `moduleResolution: "NodeNext"`, and Node types for the package. This checks imports against the runtime that will execute the emitted files, rather than relying on bundler resolution. Preserve the remaining baseline compiler options unless a documented runtime/build adjustment is needed.[^typescript]
+Use `module: "NodeNext"`, `moduleResolution: "NodeNext"`, and Node types for the package. This checks imports against the runtime that will execute the emitted files, rather than relying on bundler resolution. Keep compiler options aligned with the declared Node runtime and document any build adjustments.[^typescript]
 
 Typecheck source, tests, fixture-building code, scripts, and TypeScript configuration files. A separate build configuration may exclude development files from emitted output, but that exclusion must not remove them from type checking. Produce declarations for the public library and verify them in a temporary consumer project.
 
@@ -49,7 +47,7 @@ Typecheck source, tests, fixture-building code, scripts, and TypeScript configur
 
 **Do not relax these rules for tests, fixture builders, configuration files, scripts, or production code.** There are no test-specific size or complexity overrides. Refactor and organize code to comply; do not increase thresholds, add suppressions, or exclude files to evade these limits.
 
-| Rule                     | Required baseline                                                    |
+| Rule                     | Required limit                                                       |
 | ------------------------ | -------------------------------------------------------------------- |
 | `complexity`             | Maximum 10, classic calculation.                                     |
 | `max-depth`              | Maximum nesting depth 3.                                             |
@@ -58,41 +56,41 @@ Typecheck source, tests, fixture-building code, scripts, and TypeScript configur
 | `max-nested-callbacks`   | Maximum 3.                                                           |
 | `max-params`             | Maximum 4.                                                           |
 
-Retain `no-nested-ternary`, `no-param-reassign`, and the rest of the baseline's maintainability rules. The same expectations apply to test setup, assertions, property-test generators, and fixture declarations.[^lint]
+Enforce `no-nested-ternary`, `no-param-reassign`, and the rest of the configured maintainability rules. The same expectations apply to test setup, assertions, property-test generators, and fixture declarations.[^lint]
 
 ### Type safety and correctness
 
-Retain type-aware linting and the baseline's correctness, suspicious, pedantic, and performance categories as errors. Preserve its rules for:
+Enable type-aware linting and the correctness, suspicious, pedantic, and performance categories as errors. Enforce rules for:
 
 - Explicit `any`, non-null assertions, unsafe operations and casts, and consistent type assertions.
 - Floating/misused promises, asynchronous error handling, throwing Error objects, and unknown catch values.
 - Strict boolean expressions, unnecessary conditions, deprecations, and exhaustive switches.
 - Type-only imports/exports, explicit library module-boundary types, and immutable exports.
-- Circular, duplicate, self, CommonJS, namespace, and unassigned imports where prohibited by the baseline.
+- Circular, duplicate, self, CommonJS, namespace, and unassigned imports where prohibited by the configuration.
 - TypeScript suppression comments and unused or abusive lint-disable directives.
 
-Keep the baseline's intentionally disabled rules as configured; reuse the complete policy rather than approximating it with a small list of preferred rules. Lint warnings must fail the quality gate. Enable applicable Vitest lint rules, including detection of focused tests and incorrect asynchronous assertions.
+Keep intentionally disabled rules as configured in the complete rule set; do not replace the policy with a smaller subset of rules. Lint warnings must fail the quality gate. Enable applicable Vitest lint rules, including detection of focused tests and incorrect asynchronous assertions.
 
 ### Architecture boundaries
 
-Adapt the existing import restrictions to the wiki's modules:
+Enforce import restrictions matching the wiki's modules:
 
 - Library modules cannot depend on CLI modules.
 - Parsing and graph logic cannot directly access filesystem/process capabilities; use explicit inputs.
 - QMD imports belong in the search adapter.
 - Runtime I/O and process behavior belong at the appropriate workspace, adapter, and CLI boundaries.
 
-Use a small set of restrictions matching the architecture rather than copying Flywheel's entire layer matrix. Tests may exercise real I/O through fixtures without inheriting restrictions intended for pure production modules; this does not exempt test code from type-safety, size, complexity, or other maintainability checks.
+Keep these restrictions aligned with the architecture. Tests may exercise real I/O through fixtures without inheriting restrictions intended for pure production modules; this does not exempt test code from type-safety, size, complexity, or other maintainability checks.
 
 ## Formatting
 
-Copy the baseline style: 80-column print width, two spaces, semicolons, single quotes, ES5 trailing commas, sorted imports, and sorted package fields. Retain UTF-8, LF, final newlines, and `.editorconfig`'s treatment of Markdown trailing whitespace.[^format]
+Use this style: 80-column print width, two spaces, semicolons, single quotes, ES5 trailing commas, sorted imports, and sorted package fields. Retain UTF-8, LF, final newlines, and `.editorconfig`'s treatment of Markdown trailing whitespace.[^format]
 
-Remove Charlie's migration-specific exclusions. Exclude generated output and narrowly identified Markdown/data fixtures whose exact bytes or deliberately malformed syntax are test inputs. This is a formatter exception for fixture data, not a lint exception for test code or TypeScript fixture builders. Ordinary documentation remains formatted.
+Exclude generated output and narrowly identified Markdown/data fixtures whose exact bytes or deliberately malformed syntax are test inputs. This is a formatter exception for fixture data, not a lint exception for test code or TypeScript fixture builders. Ordinary documentation remains formatted.
 
 ## Knip
 
-Preserve the baseline's errors for unused files, dependencies, development dependencies, exports, types, members, unresolved/unlisted imports, binaries, duplicates, and cycles, with configuration/tag hints treated as errors.[^knip-baseline]
+Report errors for unused files, dependencies, development dependencies, exports, types, members, unresolved/unlisted imports, binaries, duplicates, and cycles, with configuration/tag hints treated as errors.[^knip-config]
 
 Run both modes:
 
@@ -103,7 +101,7 @@ Declare the public library entrypoint and CLI entrypoint explicitly and map them
 
 ## Tests and coverage
 
-Use Vitest on Node with the V8 coverage provider. Set coverage inclusion explicitly to production source, including CLI logic and files not imported by tests. Exclude tests, fixture data, declaration-only files, and generated output; do not carry over Charlie's blanket CLI/package coverage exclusions.
+Use Vitest on Node with the V8 coverage provider. Set coverage inclusion explicitly to production source, including CLI logic and files not imported by tests. Exclude tests, fixture data, declaration-only files, and generated output. Keep CLI code in coverage.
 
 Enforce these initial project-wide minimums in CI and the full local check:
 
@@ -139,7 +137,7 @@ Build a tarball and install it into a fresh temporary consumer project. Verify t
 - Packaged files include required runtime resources and omit development-only artifacts.
 - Installation and execution do not depend on workspace links, source-checkout paths, Bun globals, or development hook tooling.
 
-This replaces Charlie's repository-specific CLI proof and root-bin contracts. Packaging tests create a local artifact; publishing is a separate operation.
+Packaging tests create a local artifact; publishing is a separate operation.
 
 ## Scripts, Git hooks, and CI
 
@@ -156,18 +154,11 @@ Keep package scripts as the shared interface for humans, agents, hooks, and CI. 
 
 Install development hooks through repository setup. They are conveniences and early feedback; required CI checks enforce the same policy when hooks are unavailable or bypassed. These hooks maintain the code repository and are separate from the optional wiki-indexing hooks discussed in the architecture plan.
 
-Retain Charlie's SHA-pinned Actions, read-only workflow permissions, checkout without persisted credentials, frozen installs, explicit timeouts, disabled Husky execution in CI, and cancellation of superseded runs.[^ci]
+Use SHA-pinned Actions, read-only workflow permissions, checkout without persisted credentials, frozen installs, explicit timeouts, disabled Husky execution in CI, and cancellation of superseded runs.[^ci]
 
 Run the full quality/coverage gate once on the primary Linux/Node environment. Add package/runtime compatibility checks covering the minimum supported Node version and the development version across Linux and macOS. Reuse the same underlying scripts without unnecessarily repeating identical coverage work. Make the CI checks required in the repository's rules and retain the coverage artifact for inspection.
 
-## Remove from the Charlie baseline
-
-- Monorepo workspace configuration, workspace dependency contracts, and root executable symlinks.
-- Migration-specific lint, format, and Knip exclusions.
-- Zod 3 compatibility packages and unrelated CLI/SDK code-generation checks.
-- Rules requiring every package to remain private or forbidding package creation/release scripts.
-- Bun-only shipped entrypoints and `bun:test` configuration.
-- Coverage configuration that excludes the CLI or only produces a report without enforcing thresholds.
+## Policy changes
 
 Preserve the principle that code must satisfy the quality policy. Do not silently lower thresholds, suppress failures, or narrow analyzed source to make a change pass. Proposed policy changes must be explicit and justified; the agreed size and complexity limits have no test/fixture exceptions.
 
@@ -177,15 +168,13 @@ The tooling implementation is complete when the strict configurations, scripts, 
 
 ## Sources
 
-[^baseline]: [Charlie System package scripts and dependencies](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/package.json) and [Bun installation/coverage configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/bunfig.toml).
+[^lint]: [Oxlint configuration](../../oxlint.config.ts), [lint rules](../../tooling/lint-rules.ts), and [architecture restrictions](../../tooling/lint-boundaries.ts).
 
-[^lint]: [Charlie System Oxlint configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/oxlint.config.ts), the baseline for rule settings, thresholds, and architecture restrictions.
+[^typescript]: [TypeScript configuration](../../tsconfig.json) and [TypeScript guidance for compiling to Node](https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html).
 
-[^typescript]: [Charlie System TypeScript configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/tsconfig.json) and [TypeScript guidance for compiling to Node](https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html).
+[^format]: [Oxfmt configuration](../../.oxfmtrc.json) and [EditorConfig](../../.editorconfig).
 
-[^format]: [Charlie System Oxfmt configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.oxfmtrc.json) and [EditorConfig](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.editorconfig).
-
-[^knip-baseline]: [Charlie System Knip configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/knip.ts).
+[^knip-config]: [Knip configuration](../../knip.ts).
 
 [^knip-production]: [Knip production mode](https://knip.dev/features/production-mode), including separation of production and test dependency graphs.
 
@@ -193,4 +182,4 @@ The tooling implementation is complete when the strict configurations, scripts, 
 
 [^vitest-thresholds]: [Vitest coverage thresholds](https://vitest.dev/config/coverage#coverage-thresholds).
 
-[^ci]: [Charlie System CI workflow](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.github/workflows/ci.yml) and [lint-staged configuration](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/lint-staged.config.ts).
+[^ci]: [CI workflow](../../.github/workflows/ci.yml) and [lint-staged configuration](../../lint-staged.config.ts).

@@ -19,8 +19,6 @@ Keep these boundaries explicit:
 - Read commands do not rewrite authored files. `move` changes files only through an explicit, reviewable edit plan.
 - Keep content review deadlines, search-index currency, and embedding completeness separate.
 
-Flywheel provides the architectural inspiration: discover files, compile artifacts, resolve references, construct a graph, collect diagnostics, and render operation-specific results. Adopt that separation and its source-aware parsing techniques, while using our simpler document contract and QMD search.[^flywheel]
-
 ## 2. Components and dependencies
 
 ```mermaid
@@ -395,8 +393,6 @@ See the [implementation plan](implementation-plan.md) for the technical sequence
 ## Sources
 
 The source references below pin the revisions examined during design. Recheck the adapter contract against the exact QMD build selected for implementation.
-
-[^flywheel]: [Flywheel architecture](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/clis/flywheel/ARCHITECTURE.md), including its compilation and operation boundaries. Our document schema, tolerant reads, QMD retrieval, and move operation are separate design choices.
 
 [^qmd-sdk]: [QMD programmatic interface](https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/src/index.ts), including store creation, collection update, embedding, search, metadata filters, and status.
 
