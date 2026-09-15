@@ -22,10 +22,17 @@ incompatible behavior.
 
 ## Development workflow
 
-The foundation work establishes pinned dependencies, package scripts, hooks, and
-CI according to the tooling policy. Once implemented, use those package scripts
-as the shared interface for local work and CI. Do not infer a working setup from
-the reference configuration alone.
+Follow the [development setup](README.md#development-setup), then use package
+scripts as the shared interface for local work and CI. `bun run check` performs
+format, lint, type, both Knip, coverage, build, and package-consumer checks.
+`bun run test:tooling` and `bun run test:hooks` verify enforcement using disposable
+fixtures. Run `bun run test:qmd:models` separately when changing semantic search
+or upgrading QMD.
+
+Use `mise exec node@22.22.1 -- bun run test:package` after building to verify the
+minimum runtime locally. CI covers both supported runtime versions on Linux and
+macOS. Required-check configuration depends on the remote account's repository
+capabilities; a passing workflow alone does not enforce branch protection.
 
 1. Inspect the checkout and preserve unrelated changes. Use an isolated worktree
    for concurrent implementation.

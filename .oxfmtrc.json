@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "dist/**",
+    "coverage/**",
+    ".cache/**",
+    "tests/fixtures/data/**"
+  ],
+  "printWidth": 80,
+  "semi": true,
+  "singleQuote": true,
+  "sortImports": true,
+  "sortPackageJson": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false
+}

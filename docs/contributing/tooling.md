@@ -15,16 +15,16 @@ Reuse the strict tooling configuration from `charlie-labs/charlie-system`, using
 
 ## Tooling choices
 
-| Area | Decision |
-| --- | --- |
-| Type checking | TypeScript with Charlie's strict checks, additional checks listed below, and Node-compatible module resolution. |
-| Lint | Oxlint with type-aware rules and `oxlint-tsgolint`; retain the strict baseline, including all size and complexity limits. |
-| Formatting | Oxfmt and `.editorconfig`, retaining the baseline style and import/package sorting. |
-| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints. |
-| Tests | Vitest running on Node, with V8 coverage. Bun may invoke the script, but is not the test runtime. |
-| Property tests | `fast-check`, reusing Flywheel's approach of replayable seeds and minimized counterexamples. |
-| Local hooks | Husky and lint-staged: staged fixes on commit, full checks before push. |
-| CI | GitHub Actions with required checks, a reproducible install, coverage enforcement, and Linux/macOS package verification. |
+| Area                         | Decision                                                                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Type checking                | TypeScript with Charlie's strict checks, additional checks listed below, and Node-compatible module resolution.           |
+| Lint                         | Oxlint with type-aware rules and `oxlint-tsgolint`; retain the strict baseline, including all size and complexity limits. |
+| Formatting                   | Oxfmt and `.editorconfig`, retaining the baseline style and import/package sorting.                                       |
+| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints.                        |
+| Tests                        | Vitest running on Node, with V8 coverage. Bun may invoke the script, but is not the test runtime.                         |
+| Property tests               | `fast-check`, reusing Flywheel's approach of replayable seeds and minimized counterexamples.                              |
+| Local hooks                  | Husky and lint-staged: staged fixes on commit, full checks before push.                                                   |
+| CI                           | GitHub Actions with required checks, a reproducible install, coverage enforcement, and Linux/macOS package verification.  |
 
 Do not introduce a second formatter or linter alongside Oxfmt/Oxlint. The principal change from Charlie's tool stack is replacing `bun:test` with Vitest to test the intended Node runtime and enforce coverage across all production source, including unimported files and branches.[^vitest]
 
@@ -49,14 +49,14 @@ Typecheck source, tests, fixture-building code, scripts, and TypeScript configur
 
 **Do not relax these rules for tests, fixture builders, configuration files, scripts, or production code.** There are no test-specific size or complexity overrides. Refactor and organize code to comply; do not increase thresholds, add suppressions, or exclude files to evade these limits.
 
-| Rule | Required baseline |
-| --- | --- |
-| `complexity` | Maximum 10, classic calculation. |
-| `max-depth` | Maximum nesting depth 3. |
-| `max-lines` | Maximum 300 lines per file, excluding blank lines and comments. |
+| Rule                     | Required baseline                                                    |
+| ------------------------ | -------------------------------------------------------------------- |
+| `complexity`             | Maximum 10, classic calculation.                                     |
+| `max-depth`              | Maximum nesting depth 3.                                             |
+| `max-lines`              | Maximum 300 lines per file, excluding blank lines and comments.      |
 | `max-lines-per-function` | Maximum 60 lines, excluding blank lines and comments; include IIFEs. |
-| `max-nested-callbacks` | Maximum 3. |
-| `max-params` | Maximum 4. |
+| `max-nested-callbacks`   | Maximum 3.                                                           |
+| `max-params`             | Maximum 4.                                                           |
 
 Retain `no-nested-ternary`, `no-param-reassign`, and the rest of the baseline's maintainability rules. The same expectations apply to test setup, assertions, property-test generators, and fixture declarations.[^lint]
 
@@ -107,25 +107,25 @@ Use Vitest on Node with the V8 coverage provider. Set coverage inclusion explici
 
 Enforce these initial project-wide minimums in CI and the full local check:
 
-| Metric | Minimum |
-| --- | --- |
-| Lines | 90% |
-| Statements | 90% |
-| Functions | 90% |
-| Branches | 85% |
+| Metric     | Minimum |
+| ---------- | ------- |
+| Lines      | 90%     |
+| Statements | 90%     |
+| Functions  | 90%     |
+| Branches   | 85%     |
 
 Coverage percentages are a floor. Parsing, reference resolution, and moves also need explicit behavioral tests for their failure paths and invariants. Produce a readable summary and an LCOV artifact. Focused tests, an unexpectedly empty test suite, or unhandled asynchronous failures must fail checks.[^vitest-thresholds]
 
 Use these complementary test layers:
 
-| Layer | Focus |
-| --- | --- |
-| Unit and fixture tests | Frontmatter validation, Markdown structure, citations, diagnostics, source positions, filters, and freshness. |
-| Property tests | Path normalization/resolution, graph consistency, deterministic projection, and move invariants; preserve reproducible failure seeds. |
-| Filesystem integration | Real temporary directories, discovery/root boundaries, cache invalidation, edits/deletions, unreadable files, and partial failures. |
-| QMD integration | Real temporary SQLite stores, native metadata filters, projection, update/removal behavior, index status, and interrupted runs. |
-| Public API type tests | Consumer-visible declarations, accepted inputs, rejected inputs, and useful type narrowing. |
-| CLI and package tests | Actual executable behavior, argument handling, JSON/stdout separation, exit codes, and operation outside the checkout. |
+| Layer                  | Focus                                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit and fixture tests | Frontmatter validation, Markdown structure, citations, diagnostics, source positions, filters, and freshness.                         |
+| Property tests         | Path normalization/resolution, graph consistency, deterministic projection, and move invariants; preserve reproducible failure seeds. |
+| Filesystem integration | Real temporary directories, discovery/root boundaries, cache invalidation, edits/deletions, unreadable files, and partial failures.   |
+| QMD integration        | Real temporary SQLite stores, native metadata filters, projection, update/removal behavior, index status, and interrupted runs.       |
+| Public API type tests  | Consumer-visible declarations, accepted inputs, rejected inputs, and useful type narrowing.                                           |
+| CLI and package tests  | Actual executable behavior, argument handling, JSON/stdout separation, exit codes, and operation outside the checkout.                |
 
 Test CLI logic directly as well as through subprocesses; process-level smoke tests do not replace coverage of command behavior. Keep routine tests independent of model downloads and external services after dependencies are installed. Run separate embedding/hybrid-search smoke tests when upgrading QMD or changing semantic-search integration. Keep performance benchmarks separate from ordinary correctness gates.
 
@@ -147,12 +147,12 @@ Keep package scripts as the shared interface for humans, agents, hooks, and CI. 
 
 `check` runs formatting verification, lint, type checking, both Knip passes, tests with coverage, build, and package verification. The coverage run executes the normal test suite once; do not run the same suite again solely to collect coverage. CI reporter variants may change presentation, not enforced rules.
 
-| Trigger | Required behavior |
-| --- | --- |
-| Pre-commit | Husky runs lint-staged, applying supported Oxlint fixes and then Oxfmt to staged files. Preserve sequential execution with `--concurrent false`. |
-| Pre-push | Husky runs the full `check` command. |
-| Pull requests and default-branch pushes | GitHub Actions runs the required checks using frozen dependencies. |
-| QMD upgrades or semantic-search changes | Run the additional model-dependent verification separately from routine checks. |
+| Trigger                                 | Required behavior                                                                                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Pre-commit                              | Husky runs lint-staged, applying supported Oxlint fixes and then Oxfmt to staged files. Preserve sequential execution with `--concurrent false`. |
+| Pre-push                                | Husky runs the full `check` command.                                                                                                             |
+| Pull requests and default-branch pushes | GitHub Actions runs the required checks using frozen dependencies.                                                                               |
+| QMD upgrades or semantic-search changes | Run the additional model-dependent verification separately from routine checks.                                                                  |
 
 Install development hooks through repository setup. They are conveniences and early feedback; required CI checks enforce the same policy when hooks are unavailable or bypassed. These hooks maintain the code repository and are separate from the optional wiki-indexing hooks discussed in the architecture plan.
 

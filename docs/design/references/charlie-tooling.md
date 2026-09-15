@@ -10,16 +10,13 @@ Each section records the upstream Git blob SHA for provenance. The initial integ
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/package.json). Git blob: `c55156170499d8c0c3b5cf6bc2e03961ea5c08fa`.
 
-````json
+```json
 {
   "name": "@charlie-labs/charlie-system",
   "version": "0.0.0",
   "private": true,
   "workspaces": {
-    "packages": [
-      "clis/*",
-      "packages/*"
-    ]
+    "packages": ["clis/*", "packages/*"]
   },
   "type": "module",
   "scripts": {
@@ -63,13 +60,13 @@ Each section records the upstream Git blob SHA for provenance. The initial integ
   },
   "packageManager": "bun@1.3.14"
 }
-````
+```
 
 ## tsconfig.json
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/tsconfig.json). Git blob: `fd9b65f6e1d30991b8a240a197fdca2f2635f143`.
 
-````json
+```json
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -92,13 +89,13 @@ Each section records the upstream Git blob SHA for provenance. The initial integ
     "knip.ts"
   ]
 }
-````
+```
 
 ## oxlint.config.ts
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/oxlint.config.ts). Git blob: `c022dfe8f0871732168101f4a849294353526862`.
 
-````ts
+```ts
 import { defineConfig, type OxlintOverride } from 'oxlint';
 
 const basePlugins = [
@@ -381,13 +378,13 @@ export default defineConfig({
   },
   overrides: flywheelArchitectureOverrides,
 });
-````
+```
 
 ## .oxfmtrc.json
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.oxfmtrc.json). Git blob: `cba42e90e06eae49bcd859921ad58ef37851ba74`.
 
-````json
+```json
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [
@@ -409,13 +406,13 @@ export default defineConfig({
   "trailingComma": "es5",
   "useTabs": false
 }
-````
+```
 
 ## knip.ts
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/knip.ts). Git blob: `3828ca9dff9792cc9bb9620b0295319ce861c5dc`.
 
-````ts
+```ts
 import type { KnipConfig } from 'knip';
 
 const migratedKnipIssueTypes = [
@@ -483,13 +480,13 @@ const config = {
 } satisfies KnipConfig;
 
 export default config;
-````
+```
 
 ## bunfig.toml
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/bunfig.toml). Git blob: `2897cdf65c5cbfed1ec5c908080662727c6c5dae`.
 
-````toml
+```toml
 [install]
 linker = "isolated"
 minimumReleaseAge = 172800
@@ -500,13 +497,13 @@ coveragePathIgnorePatterns = [
   "**/src/cli/**",
   "**/packages/**",
 ]
-````
+```
 
 ## lint-staged.config.ts
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/lint-staged.config.ts). Git blob: `8f5d20081260d79bd92f60a78a94b66f50f4682f`.
 
-````ts
+```ts
 import type { Configuration } from 'lint-staged';
 
 const config = {
@@ -516,13 +513,13 @@ const config = {
 } satisfies Configuration;
 
 export default config;
-````
+```
 
 ## .editorconfig
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.editorconfig). Git blob: `192c070cf03df5d7af0521a1073c0919cb46f742`.
 
-````ini
+```ini
 root = true
 
 [*]
@@ -534,21 +531,21 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
-````
+```
 
 ## .husky/pre-commit
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.husky/pre-commit). Git blob: `876e24dd8b0be4f93db1043597b0e733d3527476`.
 
-````sh
+```sh
 bun run precommit
-````
+```
 
 ## .github/workflows/ci.yml
 
 [Pinned source](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/.github/workflows/ci.yml). Git blob: `d795874445137c82a8f54d5ce4e8ae0d472052e0`.
 
-````yaml
+```yaml
 name: CI
 
 on:
@@ -618,4 +615,4 @@ jobs:
 
       - name: Run CLI proof
         run: bun run cli
-````
+```

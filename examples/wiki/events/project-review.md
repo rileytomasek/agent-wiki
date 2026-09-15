@@ -8,6 +8,7 @@ location: ../places/studio.md
 starts_at: '2026-09-15T14:00:00-04:00'
 ends_at: '2026-09-15T14:30:00-04:00'
 ---
+
 # September Project Review
 
 Review the [website](../projects/website.md) and its

@@ -6,16 +6,16 @@ See the [architecture](architecture.md) for component boundaries, data models, a
 
 ## Commands
 
-| Command | Behavior |
-| --- | --- |
-| `search <query>` | Rank matching passages grouped by document, including path, title, type, heading context, source locations, relevant citation footnotes, and freshness. |
-| `show <target>` | Display a document or section by path, heading anchor, or unambiguous alias. Include footnote definitions referenced by displayed content. |
-| `list` | List documents and metadata using exact filters, ordered by path unless `--stale` is supplied. |
-| `related <target>` | Show immediate incoming and outgoing references for a local target or external URL, distinguishing body links, citations, and named frontmatter references, with originating fields or source locations. |
-| `validate [selections…]` | Validate the whole wiki without arguments; otherwise accept files, recursive directories, globs, and multiple selections. |
-| `index` | Update the QMD search index from current wiki files and generate missing embeddings. Report changes, skipped files, and failures. `--rebuild` recreates the search index. |
-| `status` | Show the resolved root, index availability and coverage, pending embeddings, last completed update, and known indexing problems. |
-| `move <from> <to>` | Move or rename a document, updating incoming Markdown and frontmatter references plus relative references inside it. Preserve unrelated content, refuse destination collisions, and support `--dry-run` previews. |
+| Command                  | Behavior                                                                                                                                                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search <query>`         | Rank matching passages grouped by document, including path, title, type, heading context, source locations, relevant citation footnotes, and freshness.                                                           |
+| `show <target>`          | Display a document or section by path, heading anchor, or unambiguous alias. Include footnote definitions referenced by displayed content.                                                                        |
+| `list`                   | List documents and metadata using exact filters, ordered by path unless `--stale` is supplied.                                                                                                                    |
+| `related <target>`       | Show immediate incoming and outgoing references for a local target or external URL, distinguishing body links, citations, and named frontmatter references, with originating fields or source locations.          |
+| `validate [selections…]` | Validate the whole wiki without arguments; otherwise accept files, recursive directories, globs, and multiple selections.                                                                                         |
+| `index`                  | Update the QMD search index from current wiki files and generate missing embeddings. Report changes, skipped files, and failures. `--rebuild` recreates the search index.                                         |
+| `status`                 | Show the resolved root, index availability and coverage, pending embeddings, last completed update, and known indexing problems.                                                                                  |
+| `move <from> <to>`       | Move or rename a document, updating incoming Markdown and frontmatter references plus relative references inside it. Preserve unrelated content, refuse destination collisions, and support `--dry-run` previews. |
 
 ## Flags
 
