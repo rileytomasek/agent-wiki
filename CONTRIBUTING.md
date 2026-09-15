@@ -11,7 +11,7 @@ Read the [document format](docs/design/document-format.md),
 [CLI specification](docs/design/cli-spec.md), and
 [architecture](docs/design/architecture.md). Use the
 [implementation plan](docs/design/implementation-plan.md) for integration order
-and [conformance scenarios](docs/design/conformance.md) for behavioral coverage.
+and [conformance scenarios](docs/design/conformance.md) for expected behavior.
 
 The format and CLI specifications govern observable behavior. Architecture governs
 component responsibilities; its internal names and interface sketches are
@@ -24,7 +24,7 @@ incompatible behavior.
 
 Follow the [development setup](README.md#development-setup), then use package
 scripts as the shared interface for local work and CI. `bun run check` performs
-format, lint, type, both Knip, coverage, build, and package-consumer checks.
+format, lint, type, both Knip, test, build, and package-consumer checks.
 `bun run test:tooling` and `bun run test:hooks` verify enforcement using disposable
 fixtures. Run `bun run test:qmd:models` separately when changing semantic search
 or upgrading QMD.

@@ -67,7 +67,7 @@ Start with [CONTRIBUTING.md](CONTRIBUTING.md). Agents should also read
 | [Architecture](docs/design/architecture.md)               | Models, component boundaries, parsing, graph, QMD, and failure handling.  |
 | [Implementation plan](docs/design/implementation-plan.md) | Technical sequence, integration prerequisites, and verification approach. |
 | [Conformance](docs/design/conformance.md)                 | Durable behavioral scenarios to turn into tests.                          |
-| [Tooling policy](docs/contributing/tooling.md)            | Strict types, lint, format, Knip, coverage, hooks, packaging, and CI.     |
+| [Tooling policy](docs/contributing/tooling.md)            | Strict types, lint, format, Knip, tests, hooks, packaging, and CI.        |
 
 [The Agent Wiki Linear project](https://linear.app/tomasekio/project/agent-wiki-fc8efac8c2ef)
 owns implementation issues, dependencies, priorities, and delivery status.

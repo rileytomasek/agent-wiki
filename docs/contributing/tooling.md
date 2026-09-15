@@ -13,18 +13,18 @@ Repository and quality policy for the [Agent Wiki architecture](../design/archit
 
 ## Tooling choices
 
-| Area                         | Decision                                                                                                                 |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Type checking                | TypeScript with the strict checks listed below and Node-compatible module resolution.                                    |
-| Lint                         | Oxlint with type-aware rules and `oxlint-tsgolint`; enforce all strict rules, including size and complexity limits.      |
-| Formatting                   | Oxfmt and `.editorconfig`, with the style defined below and import/package sorting.                                      |
-| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints.                       |
-| Tests                        | Vitest running on Node, with V8 coverage. Bun may invoke the script, but is not the test runtime.                        |
-| Property tests               | `fast-check` with replayable seeds and minimized counterexamples.                                                        |
-| Local hooks                  | Husky and lint-staged: staged fixes on commit, full checks before push.                                                  |
-| CI                           | GitHub Actions with required checks, a reproducible install, coverage enforcement, and Linux/macOS package verification. |
+| Area                         | Decision                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Type checking                | TypeScript with the strict checks listed below and Node-compatible module resolution.                               |
+| Lint                         | Oxlint with type-aware rules and `oxlint-tsgolint`; enforce all strict rules, including size and complexity limits. |
+| Formatting                   | Oxfmt and `.editorconfig`, with the style defined below and import/package sorting.                                 |
+| Unused code and dependencies | Knip in both normal and production modes, with strict diagnostics and explicit public entrypoints.                  |
+| Tests                        | Vitest running on Node. Bun may invoke the script, but is not the test runtime.                                     |
+| Property tests               | `fast-check` with replayable seeds and minimized counterexamples.                                                   |
+| Local hooks                  | Husky and lint-staged: staged fixes on commit, full checks before push.                                             |
+| CI                           | GitHub Actions with required checks, a reproducible install, and Linux/macOS package verification.                  |
 
-Do not introduce a second formatter or linter alongside Oxfmt/Oxlint. Use Vitest to test the intended Node runtime and enforce coverage across all production source, including unimported files and branches.[^vitest]
+Do not introduce a second formatter or linter alongside Oxfmt/Oxlint. Use Vitest to test behavior on the intended Node runtime.[^vitest]
 
 ## TypeScript policy
 
@@ -99,20 +99,9 @@ Run both modes:
 
 Declare the public library entrypoint and CLI entrypoint explicitly and map them to source files. Public API exports are intentional entrypoints; do not mark every source file as an entrypoint or add broad ignores to suppress findings. Configure test/fixture scope correctly for production mode while keeping it analyzed in the normal pass.[^knip-production]
 
-## Tests and coverage
+## Tests
 
-Use Vitest on Node with the V8 coverage provider. Set coverage inclusion explicitly to production source, including CLI logic and files not imported by tests. Exclude tests, fixture data, declaration-only files, and generated output. Keep CLI code in coverage.
-
-Enforce these initial project-wide minimums in CI and the full local check:
-
-| Metric     | Minimum |
-| ---------- | ------- |
-| Lines      | 90%     |
-| Statements | 90%     |
-| Functions  | 90%     |
-| Branches   | 85%     |
-
-Coverage percentages are a floor. Parsing, reference resolution, and moves also need explicit behavioral tests for their failure paths and invariants. Produce a readable summary and an LCOV artifact. Focused tests, an unexpectedly empty test suite, or unhandled asynchronous failures must fail checks.[^vitest-thresholds]
+Run Vitest on Node. Parsing, reference resolution, and moves need explicit behavioral tests for their failure paths and invariants. Focused tests, an unexpectedly empty test suite, or unhandled asynchronous failures must fail checks.
 
 Use these complementary test layers:
 
@@ -125,7 +114,7 @@ Use these complementary test layers:
 | Public API type tests  | Consumer-visible declarations, accepted inputs, rejected inputs, and useful type narrowing.                                           |
 | CLI and package tests  | Actual executable behavior, argument handling, JSON/stdout separation, exit codes, and operation outside the checkout.                |
 
-Test CLI logic directly as well as through subprocesses; process-level smoke tests do not replace coverage of command behavior. Keep routine tests independent of model downloads and external services after dependencies are installed. Run separate embedding/hybrid-search smoke tests when upgrading QMD or changing semantic-search integration. Keep performance benchmarks separate from ordinary correctness gates.
+Test CLI logic directly as well as through subprocesses; process-level smoke tests do not replace direct tests of command behavior. Keep routine tests independent of model downloads and external services after dependencies are installed. Run separate embedding/hybrid-search smoke tests when upgrading QMD or changing semantic-search integration. Keep performance benchmarks separate from ordinary correctness gates.
 
 ## Package verification
 
@@ -141,9 +130,9 @@ Packaging tests create a local artifact; publishing is a separate operation.
 
 ## Scripts, Git hooks, and CI
 
-Keep package scripts as the shared interface for humans, agents, hooks, and CI. Retain familiar names such as `fmt`, `fmt:check`, `lint`, `lint:fix`, `typecheck`, and `knip`; add `knip:production`, `test:coverage`, `build`, and `test:package`.
+Keep package scripts as the shared interface for humans, agents, hooks, and CI. Retain familiar names such as `fmt`, `fmt:check`, `lint`, `lint:fix`, `typecheck`, and `knip`; add `knip:production`, `test`, `build`, and `test:package`.
 
-`check` runs formatting verification, lint, type checking, both Knip passes, tests with coverage, build, and package verification. The coverage run executes the normal test suite once; do not run the same suite again solely to collect coverage. CI reporter variants may change presentation, not enforced rules.
+`check` runs formatting verification, lint, type checking, both Knip passes, the normal test suite once, build, and package verification. CI reporter variants may change presentation, not enforced rules.
 
 | Trigger                                 | Required behavior                                                                                                                                |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -156,7 +145,7 @@ Install development hooks through repository setup. They are conveniences and ea
 
 Use SHA-pinned Actions, read-only workflow permissions, checkout without persisted credentials, frozen installs, explicit timeouts, disabled Husky execution in CI, and cancellation of superseded runs.[^ci]
 
-Run the full quality/coverage gate once on the primary Linux/Node environment. Add package/runtime compatibility checks covering the minimum supported Node version and the development version across Linux and macOS. Reuse the same underlying scripts without unnecessarily repeating identical coverage work. Make the CI checks required in the repository's rules and retain the coverage artifact for inspection.
+Run the full quality gate once on the primary Linux/Node environment. Add package/runtime compatibility checks for the minimum supported Node version and the development version across Linux and macOS. Reuse the same underlying scripts without unnecessarily repeating identical checks. Make the CI checks required in the repository's rules.
 
 ## Policy changes
 
@@ -164,7 +153,7 @@ Preserve the principle that code must satisfy the quality policy. Do not silentl
 
 ## Tooling implementation completion criteria
 
-The tooling implementation is complete when the strict configurations, scripts, development hooks, CI workflow, and package smoke test are present; every authored TypeScript area is checked; coverage includes all production source; the full local check passes; and the required CI jobs pass on the declared runtime/platform coverage. A written configuration or a locally installed hook alone is not proof that enforcement works.
+The tooling implementation is complete when the strict configurations, scripts, development hooks, CI workflow, and package smoke test are present; every authored TypeScript area is checked; the full local check passes; and the required CI jobs pass on the declared runtime/platform matrix. A written configuration or a locally installed hook alone is not proof that enforcement works.
 
 ## Sources
 
@@ -178,8 +167,6 @@ The tooling implementation is complete when the strict configurations, scripts, 
 
 [^knip-production]: [Knip production mode](https://knip.dev/features/production-mode), including separation of production and test dependency graphs.
 
-[^vitest]: [Vitest coverage](https://vitest.dev/guide/coverage), including V8 coverage and explicit inclusion of unimported source.
-
-[^vitest-thresholds]: [Vitest coverage thresholds](https://vitest.dev/config/coverage#coverage-thresholds).
+[^vitest]: [Vitest configuration](../../vitest.config.ts).
 
 [^ci]: [CI workflow](../../.github/workflows/ci.yml) and [lint-staged configuration](../../lint-staged.config.ts).

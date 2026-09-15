@@ -2,7 +2,7 @@
 
 Architecture for the [Agent Wiki format](document-format.md) and [CLI functional spec](cli-spec.md). This documents the agreed direction and proposes concrete implementation defaults; it does not describe an implemented CLI. The format spec governs authored content, and the functional spec governs commands. Internal names and interfaces below are illustrative.
 
-The [repository setup and code-quality decisions](../contributing/tooling.md) define the strict tooling, test coverage, development Git hooks, and CI required from the initial setup phase.
+The [repository setup and code-quality decisions](../contributing/tooling.md) define the strict tooling, tests, development Git hooks, and CI required from the initial setup phase.
 
 ## 1. Design and scope
 

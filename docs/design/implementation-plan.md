@@ -14,7 +14,7 @@ complete [tooling policy](../contributing/tooling.md) from the start. Keep tests
 and config code within the same type and size/complexity rules as production code.
 
 Choose and pin compatible Node, Bun, TypeScript, Oxlint/type-aware engine, Oxfmt,
-Knip, Vitest/V8, and QMD artifacts. Bun invokes development scripts; shipped code
+Knip, Vitest, and QMD artifacts. Bun invokes development scripts; shipped code
 and tests run on Node. Add strict checks, staged fixes, pre-push checks, and CI
 through shared scripts. Verify the minimum supported and development Node
 versions against the actual dependency set.
@@ -160,7 +160,7 @@ or strict checks to a final integration stage.
 Verify actual CLI subprocess behavior and the library's public types. Build a
 tarball, install it in a fresh consumer outside the checkout, and exercise both
 entrypoints under the supported Node/platform matrix. Run the full quality gate
-once per required primary environment with the specified coverage floors. Verify
+once per required primary environment. Verify
 CI and required-check enforcement when a remote is configured; report that
 separately from local results.
 

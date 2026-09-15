@@ -4,7 +4,7 @@ import { boundaries } from './tooling/lint-boundaries.ts';
 import { lintRules } from './tooling/lint-rules.ts';
 
 export default defineConfig({
-  ignorePatterns: ['dist/**', 'coverage/**', '.cache/**'],
+  ignorePatterns: ['dist/**', '.cache/**'],
   plugins: ['import', 'oxc', 'promise', 'typescript', 'unicorn', 'vitest'],
   categories: {
     correctness: 'error',

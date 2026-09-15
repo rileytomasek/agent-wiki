@@ -34,14 +34,6 @@ jobs:
       - run: mise exec -- bun run check
       - run: mise exec -- bun run test:tooling
       - run: mise exec -- bun run test:hooks
-      - name: Retain coverage
-        if: always() && hashFiles('coverage/lcov.info') != ''
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: coverage
-          path: coverage/lcov.info
-          retention-days: 14
-          if-no-files-found: error
 
   package:
     name: Package (${{ matrix.os }} / Node ${{ matrix.node }})

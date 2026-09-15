@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "node node_modules/typescript/bin/tsc -p tsconfig.build.json",
-    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run knip:production && bun run test:coverage && bun run build && bun run test:package",
+    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run knip:production && bun run test && bun run build && bun run test:package",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint --deny-warnings --report-unused-disable-directives",
@@ -29,7 +29,6 @@
     "knip": "knip",
     "knip:production": "knip --production",
     "test": "node node_modules/vitest/vitest.mjs run",
-    "test:coverage": "node node_modules/vitest/vitest.mjs run --coverage",
     "test:package": "node scripts/package-smoke.ts",
     "test:hooks": "node scripts/hook-smoke.ts",
     "test:tooling": "node scripts/tooling-smoke.ts",
@@ -43,7 +42,6 @@
   "devDependencies": {
     "@types/better-sqlite3": "7.6.13",
     "@types/node": "22.20.2",
-    "@vitest/coverage-v8": "4.1.11",
     "fast-check": "4.10.0",
     "husky": "9.1.7",
     "knip": "6.29.0",

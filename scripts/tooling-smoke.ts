@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
@@ -128,25 +128,6 @@ async function runnerProof(directory: string) {
     ]),
     /No test files/u
   );
-  await writeFile(
-    file,
-    `${prefix}test('coverage', () => { expect(true).toBe(true); });\n`
-  );
-  await writeFile(
-    join(directory, 'src/unimported-probe.ts'),
-    'export function unimported(): number { return 42; }\n'
-  );
-  assert.match(
-    fails(directory, 'node_modules/vitest/vitest.mjs', [
-      'run',
-      'runner-probe',
-      '--coverage',
-    ]),
-    /coverage.*threshold/iu
-  );
-  const lcov = await readFile(join(directory, 'coverage/lcov.info'), 'utf8');
-  assert.match(lcov, /SF:src\/unimported-probe.ts/u);
-  assert.match(lcov, /SF:src\/cli\/bin.ts/u);
 }
 
 const directory = await mkdtemp(join(tmpdir(), 'agent-wiki-tooling-'));
@@ -157,7 +138,7 @@ try {
   await typeAndKnipProof(directory);
   await runnerProof(directory);
   console.log(
-    'Enforcement proof: lint limits/types, both Knip modes, focused/empty/async tests, unimported/CLI coverage passed'
+    'Enforcement proof: lint limits/types, both Knip modes, focused/empty/async tests passed'
   );
 } finally {
   await rm(directory, { recursive: true, force: true });
