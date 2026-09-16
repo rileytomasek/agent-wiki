@@ -8,7 +8,7 @@ See the [architecture](architecture.md) for component boundaries, data models, a
 
 | Command                  | Behavior                                                                                                                                                                                                          |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search <query>`         | Rank matching passages grouped by document, including path, title, type, heading context, source locations, relevant citation footnotes, and freshness.                                                           |
+| `search <query>`         | Search the existing QMD snapshot with native ranking, filters, scores, and snippets. Return original indexed paths, titles, metadata, and review status, with at most one index-state notice.                     |
 | `show <target>`          | Display a document or section by path, heading anchor, or unambiguous alias. Include footnote definitions referenced by displayed content.                                                                        |
 | `list`                   | List documents and metadata using exact filters, ordered by path unless `--stale` is supplied.                                                                                                                    |
 | `related <target>`       | Show immediate incoming and outgoing references for a local target or external URL, distinguishing body links, citations, and named frontmatter references, with originating fields or source locations.          |
@@ -40,3 +40,10 @@ Validation checks frontmatter, exactly one H1, internal destinations and heading
 Authored files remain authoritative; QMD's search index is replaceable derived data. Other read commands use current files. Provide readable output and structured JSON, identifying known indexing gaps and relevant content limitations. Document errors should not block otherwise usable read operations; `validate` returns nonzero for structural errors. Ambiguous aliases report candidates, and operational failures return nonzero. Successful empty results remain distinct from failures. Commands do not fetch external content; only `move` modifies authored files.
 
 Search uses the existing index without indexing first. If stale or incomplete, emit one index-level notice with a `wiki index` recovery instruction, not per-result warnings. A missing index requires explicit indexing. Index currency is separate from document review deadlines.
+
+Search presentation uses QMD's public snippet helper and native chunk selection.
+Any snippet positions describe indexed content, not exact original-file lines.
+Custom heading breadcrumbs, automatic citation-definition expansion, and exact
+source-line mapping are deferred. Use `show` for current document or section
+inspection with referenced footnotes. Search does not parse Markdown bodies or
+build a reference graph to enrich results.

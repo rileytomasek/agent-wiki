@@ -77,6 +77,13 @@ index locking, partial-source preservation, and explicit index/status commands.
 QMD aggregate counts alone do not establish complete indexing of an authored
 wiki; source coverage and text/embedding stages remain separately recorded.
 
+Search mapping retains indexed `body`, `bestChunk`, and `bestChunkPos`, then uses
+the exported `extractSnippet` helper. Public wiki search returns its native text
+with an indexed-content label; it does not turn generated positions into exact
+original-source lines. Titles, metadata, and review deadlines come from the
+snapshot, even when current files have changed or moved. Search totals and
+truncation are unknown rather than inferred from a bounded result window.
+
 ## Verification
 
 Routine tests use synthetic Markdown and real temporary SQLite stores. They cover
@@ -89,9 +96,12 @@ checkout using Node/npm with no Bun on PATH, compiles a TypeScript 7 consumer wi
 `skipLibCheck: false`, runs the installed executable, and repeats metadata and
 deletion operations through the package's public exports.
 
-`test:qmd:models` is separate from ordinary tests. The initial macOS/Node 24.21.0
-proof embedded three documents without errors, reported zero pending embeddings,
-and ranked the garden document first for a semantic cold-weather plant query.
+`test:qmd:models` is separate from ordinary tests. The macOS/Node 24.21.0
+proof on 2026-09-16 indexed and embedded three documents through `indexWiki`
+without errors, reported current status with zero pending embeddings, and ranked
+the garden document first for a semantic cold-weather plant query through the
+actual `wiki search --json` executable. It also verified native snippets, literal
+Unicode/percent/hash paths, filters, limits, scores, and one valid JSON result.
 It uses QMD's default EmbeddingGemma 300M, query-expansion 1.7B, and Qwen3 reranker
 models, cached under `.cache/model-smoke`. CI compatibility jobs exercise native
 SQLite and packaging without downloading inference models.
