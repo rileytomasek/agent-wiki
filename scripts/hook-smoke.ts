@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { run } from './process.ts';
+import { run, subprocessEnvironment } from './process.ts';
 import { copyRepository } from './repository-fixture.ts';
 
 function initialize(directory: string) {
@@ -56,7 +56,7 @@ async function pushProof(directory: string) {
     cwd: directory,
     encoding: 'utf8',
     timeout: 120_000,
-    env: { ...process.env, HUSKY: '1' },
+    env: { ...subprocessEnvironment(), HUSKY: '1' },
   });
   assert.equal(result.error, undefined);
   assert.notEqual(result.status, 0);

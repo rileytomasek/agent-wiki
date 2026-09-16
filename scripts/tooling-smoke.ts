@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
+import { subprocessEnvironment } from './process.ts';
 import { copyRepository } from './repository-fixture.ts';
 
 function fails(directory: string, program: string, args: readonly string[]) {
@@ -12,6 +13,7 @@ function fails(directory: string, program: string, args: readonly string[]) {
     encoding: 'utf8',
     timeout: 120_000,
     maxBuffer: 10 * 1024 * 1024,
+    env: subprocessEnvironment(),
   });
   assert.equal(result.error, undefined);
   assert.notEqual(

@@ -5,6 +5,15 @@ interface Options {
   readonly env?: NodeJS.ProcessEnv;
 }
 
+/** Git hooks export repository selectors that must not reach disposable fixtures. */
+export function subprocessEnvironment(
+  environment: NodeJS.ProcessEnv = process.env
+): NodeJS.ProcessEnv {
+  return Object.fromEntries(
+    Object.entries(environment).filter(([key]) => !key.startsWith('GIT_'))
+  );
+}
+
 export function run(
   command: string,
   args: readonly string[],
@@ -15,6 +24,7 @@ export function run(
     timeout: 600_000,
     maxBuffer: 10 * 1024 * 1024,
     ...options,
+    env: subprocessEnvironment(options.env),
   });
   if (result.error !== undefined) throw result.error;
   if (result.status !== 0) {
