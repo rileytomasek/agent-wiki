@@ -34,6 +34,16 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     'status',
     'Inspect index availability, source currency, and recorded coverage without models.',
   ],
+  related: [
+    'related <path[#heading] | alias | attachment | URL> [--limit <number>]',
+    'Inspect immediate incoming and outgoing authored references.',
+    '  --limit <number>    Positive relationship limit (default: unlimited)',
+  ],
+  validate: [
+    'validate [files | directories | globs ...]',
+    'Validate the whole wiki, or selected files against whole-wiki context.',
+    'Quote globs so wiki can expand them relative to its root.',
+  ],
 };
 
 export function help(command?: string): string {
@@ -57,8 +67,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list, index, status.',
-      'Planned commands: search, related, validate, move.',
+      'Available commands: show, list, related, validate, index, status.',
+      'Planned commands: search, move.',
     ]),
   ].join('\n');
 }

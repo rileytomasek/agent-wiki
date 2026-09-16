@@ -1,6 +1,7 @@
 # Commands
 
-`show` and `list` read current files and work before search indexing is available.
+`show`, `list`, `related`, and `validate` read current files and work before
+search indexing is available.
 During development, build with `mise exec -- bun run build` and run
 `mise exec -- node dist/cli/bin.js` in place of `wiki` below. See the repository
 [setup instructions](../../README.md#development-setup).
@@ -83,6 +84,41 @@ Writers share an exclusive lock. After an interrupted process, inspect the PID
 and host in `.agent-wiki/cache/write.lock`. If that owner has stopped, remove
 that abandoned lock and rerun the command. Existing locks are never stolen by
 a timer or another process.
+
+## Inspect references
+
+```sh
+wiki related projects/website.md --root examples/wiki
+wiki related 'guides/deployment.md#deploy' --root examples/wiki --json
+wiki related 'https://github.com/owner/repo/pull/12' --limit 10
+```
+
+Relationships preserve the authored link, citation use, or frontmatter field and
+its source location. Document lookup includes references to its sections; a
+section lookup narrows the relationships. Attachments and external URLs are
+addressable targets. No remote content is fetched, and a citation is not a claim
+that its destination supports the surrounding text.
+
+The default is unlimited; `--limit` counts relationships. A self-reference is
+reported once with direction `both`. Unresolved outgoing destinations remain
+visible with diagnostics. Declared aliases are lookup conveniences; authored
+references resolve paths, never aliases.
+
+## Validate current content
+
+```sh
+wiki validate --root examples/wiki
+wiki validate guides projects/website.md --root examples/wiki
+wiki validate 'guides/**/*.md' --root examples/wiki --json
+```
+
+Without selections, validation covers every discovered document. Files,
+recursive directories, and quoted globs can be combined; overlapping selections
+are deduplicated. A selection with no matches is an error. References always
+resolve against the whole wiki, while document diagnostics are limited to the
+selected files. Structural errors or incomplete filesystem coverage exit
+nonzero. A shared alias is ambiguous when looked up; sharing an alias does not
+by itself invalidate either document.
 
 ## JSON and failures
 

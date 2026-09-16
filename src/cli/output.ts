@@ -26,7 +26,7 @@ export function failure(error: unknown, json: boolean): CliResult {
   const code = error instanceof OperationError ? error.code : 'cli_error';
   const candidates = error instanceof OperationError ? error.candidates : [];
   const result = {
-    diagnostics: [{ code, message, path: '' }],
+    diagnostics: [{ code, severity: 'error', message, path: '' }],
     ...(candidates.length === 0 ? {} : { candidates }),
   };
   if (json)

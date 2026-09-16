@@ -65,7 +65,12 @@ test('unavailable and unknown commands fail honestly with separated output', asy
   expect(structured.exitCode).toBe(1);
   expect(JSON.parse(structured.stdout)).toEqual({
     diagnostics: [
-      { code: 'cli_error', message: 'Unknown command: typo', path: '' },
+      {
+        code: 'cli_error',
+        severity: 'error',
+        message: 'Unknown command: typo',
+        path: '',
+      },
     ],
   });
 });
