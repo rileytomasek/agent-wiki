@@ -3,9 +3,9 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "agent-wiki",
+      "name": "@rileytomasek/agent-wiki",
       "dependencies": {
-        "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+        "@tobilu/qmd": "npm:@rileytomasek/qmd-snapshot@2.8.3-snapshot.04e4dbd.0",
         "github-slugger": "2.0.0",
         "mdast-util-from-markdown": "2.0.2",
         "mdast-util-frontmatter": "2.0.1",
@@ -17,7 +17,6 @@
         "yaml": "2.8.2",
       },
       "devDependencies": {
-        "@types/better-sqlite3": "7.6.13",
         "@types/mdast": "4.0.4",
         "@types/node": "22.20.2",
         "fast-check": "4.10.0",
@@ -34,12 +33,9 @@
     },
   },
   "trustedDependencies": [
-    "@tobilu/qmd",
+    "better-sqlite3",
     "node-llama-cpp",
   ],
-  "patchedDependencies": {
-    "@tobilu/qmd@github:tobi/qmd#04e4dbd": "patches/@tobilu%2Fqmd@github%3Atobi%2Fqmd#04e4dbd.patch",
-  },
   "packages": {
     "@emnapi/core": ["@emnapi/core@1.11.2", "", { "dependencies": { "@emnapi/wasi-threads": "1.2.2", "tslib": "^2.4.0" } }, "sha512-TC8MkTuZUtcTSiFeuC0ksCh9QIJ5+F21MvZ4Wn4ORfYaFJ/0dsiudv5tVkejgwZlwQ39jL9WWDe2lz8x0WglOA=="],
 
@@ -395,11 +391,9 @@
 
     "@tinyhttp/content-disposition": ["@tinyhttp/content-disposition@2.2.4", "", {}, "sha512-5Kc5CM2Ysn3vTTArBs2vESUt0AQiWZA86yc1TI3B+lxXmtEq133C1nxXNOgnzhrivdPZIh3zLj5gDnZjoLL5GA=="],
 
-    "@tobilu/qmd": ["@tobilu/qmd@github:tobi/qmd#04e4dbd", { "dependencies": { "@modelcontextprotocol/server": "2.0.0", "better-sqlite3": "^13.0.3", "fast-glob": "3.3.3", "node-llama-cpp": "3.20.0", "picomatch": "4.0.5", "sqlite-vec": "0.1.9", "tree-sitter-go": "0.25.0", "tree-sitter-python": "0.25.0", "tree-sitter-rust": "0.24.0", "tree-sitter-typescript": "0.23.2", "web-tree-sitter": "0.26.12", "yaml": "2.9.0", "zod": "4.2.1" }, "optionalDependencies": { "sqlite-vec-darwin-arm64": "0.1.9", "sqlite-vec-darwin-x64": "0.1.9", "sqlite-vec-linux-arm64": "0.1.9", "sqlite-vec-linux-x64": "0.1.9", "sqlite-vec-windows-x64": "0.1.9" }, "peerDependencies": { "typescript": "^5.9.3" }, "bin": { "qmd": "bin/qmd" } }, "tobi-qmd-04e4dbd", "sha512-r5rQ29SUD2b+8AU6d/X3SXakfymjMuHwy+1tAEAVuiNhS3eJGS8Htb12fPQb7jzvyPrkvwV/pVWNk0tg7vKSxA=="],
+    "@tobilu/qmd": ["@rileytomasek/qmd-snapshot@2.8.3-snapshot.04e4dbd.0", "", { "dependencies": { "@modelcontextprotocol/server": "2.0.0", "better-sqlite3": "^13.0.3", "fast-glob": "3.3.3", "node-llama-cpp": "3.20.0", "picomatch": "4.0.5", "sqlite-vec": "0.1.9", "tree-sitter-go": "0.25.0", "tree-sitter-python": "0.25.0", "tree-sitter-rust": "0.24.0", "tree-sitter-typescript": "0.23.2", "web-tree-sitter": "0.26.12", "yaml": "2.9.0", "zod": "4.2.1" }, "optionalDependencies": { "sqlite-vec-darwin-arm64": "0.1.9", "sqlite-vec-darwin-x64": "0.1.9", "sqlite-vec-linux-arm64": "0.1.9", "sqlite-vec-linux-x64": "0.1.9", "sqlite-vec-windows-x64": "0.1.9" }, "bin": { "qmd": "bin/qmd" } }, "sha512-FXwpcchq+fNwnp7E2LQG1ZAqyVFdtaUCTvaqb1IAysYh4mdeGbAY/rEbN8lcZVzvcf8Z5RVdQmQiQVSyJDrk8Q=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.4", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A=="],
-
-    "@types/better-sqlite3": ["@types/better-sqlite3@7.6.13", "", { "dependencies": { "@types/node": "*" } }, "sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA=="],
 
     "@types/chai": ["@types/chai@5.2.3", "", { "dependencies": { "@types/deep-eql": "*", "assertion-error": "^2.0.1" } }, "sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA=="],
 

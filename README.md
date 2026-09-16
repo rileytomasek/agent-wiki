@@ -48,27 +48,52 @@ mise exec -- bun run test:qmd:models # Real embedding and hybrid search
 ```
 
 The separate model proof downloads roughly 2.1 GB into `.cache/model-smoke` on
-first use. Package verification installs a local tarball into a fresh temporary
-Node/npm consumer and needs access to dependency sources. It does not publish.
+first use. Package verification installs a local tarball into fresh temporary
+Node/npm and Bun consumers and needs access to dependency sources. It does not publish.
 
 ## For wiki authors
 
-### Install a local build
-
-After the development setup builds the package, create and install a tarball:
+### Install
 
 ```sh
-npm pack --ignore-scripts
-npm install --global ./agent-wiki-0.0.0.tgz
+npm install --global @rileytomasek/agent-wiki
 wiki --help
 wiki show guides/deployment.md --root /path/to/your/wiki
+wiki index --root /path/to/your/wiki
+wiki search 'deployment' --root /path/to/your/wiki
 ```
 
-The installed package supports Node `^22.22.1` or `^24.21.0`, and needs
-access to its npm/Git dependencies during installation. It does not require Bun
-or development hooks. This repository has not published a package to npm.
-QMD's first index/search operation that needs models can download roughly 2.1 GB;
-current-file inspection and validation work without those models.
+For the library:
+
+```sh
+npm install @rileytomasek/agent-wiki
+```
+
+```js
+import { showDocument, indexWiki, searchWiki } from '@rileytomasek/agent-wiki';
+
+const root = '/absolute/path/to/your/wiki';
+const document = await showDocument(root, 'guides/deployment.md');
+await indexWiki(root);
+const results = await searchWiki(root, 'deployment');
+```
+
+The package supports Node `^22.22.1` or `^24.21.0`. Fresh Bun 1.4.2
+installations are also verified. For Bun projects with an explicit lifecycle
+allowlist, include `better-sqlite3` and `node-llama-cpp` in
+`trustedDependencies`, then run `bun install`. No global QMD installation,
+source-build patches, Bun runtime, or development hooks are required by Node
+consumers. Agent Wiki installs its prebuilt QMD dependency automatically.
+
+The first index/search operation that needs models can download roughly 2.1 GB.
+Current-file inspection and validation work without those models. Reads use the
+current Markdown files; search uses the last explicit `wiki index` snapshot.
+
+Agent Wiki is published as
+[`@rileytomasek/agent-wiki`](https://www.npmjs.com/package/@rileytomasek/agent-wiki)
+under the MIT license. The temporary QMD snapshot preserves upstream's MIT
+license and source identity. See the [release guide](docs/contributing/releases.md)
+for packaging and publication.
 
 - [Authoring guide](docs/user/authoring.md): write and connect documents.
 - [Type examples](docs/user/type-examples.md): choose useful descriptive labels.

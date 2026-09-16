@@ -180,7 +180,7 @@ latency targets.
 
 The first release includes the eight specified commands, offline external targets,
 and development quality hooks. Indexing-hook installation, background watchers,
-external enrichment, provider configuration, and publication are deferred.
+external enrichment and provider configuration are deferred. Public npm distribution is specified in the [release guide](../contributing/releases.md).
 Do not add plugin loading or schedulers merely to reserve future extension points.
 
 Choose compatible dependency versions, helper APIs, JSON field names, diagnostic

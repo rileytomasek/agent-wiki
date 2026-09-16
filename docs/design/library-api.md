@@ -7,7 +7,11 @@ The [format](document-format.md) and [CLI contract](cli-spec.md) govern behavior
 ## Current source and parsing
 
 ```ts
-import { resolveRoot, readDocument, refreshWorkspace } from 'agent-wiki';
+import {
+  resolveRoot,
+  readDocument,
+  refreshWorkspace,
+} from '@rileytomasek/agent-wiki';
 
 const root = await resolveRoot({ cwd: process.cwd() });
 const current = await readDocument(root, 'projects/wiki.md');
@@ -176,7 +180,11 @@ non-HTTP schemes. Alias collisions are lookup ambiguity, not structural errors.
 ## Planned document moves
 
 ```ts
-import { applyMove, formatMoveDiff, moveDocument } from 'agent-wiki';
+import {
+  applyMove,
+  formatMoveDiff,
+  moveDocument,
+} from '@rileytomasek/agent-wiki';
 
 const preview = await moveDocument(root, 'old.md', 'notes/new.md', {
   dryRun: true,

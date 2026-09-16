@@ -18,7 +18,7 @@ import {
   showDocument,
   validate,
   version,
-} from 'agent-wiki';
+} from '@rileytomasek/agent-wiki';
 
 assert.equal(typeof version, 'string');
 const wikiRoot = resolve('wiki');
@@ -85,4 +85,4 @@ try {
 } finally {
   await store.close();
 }
-console.log(`Node ${process.version}: packaged SDK metadata/lifecycle passed`);
+console.log(`Packaged SDK metadata/lifecycle passed`);

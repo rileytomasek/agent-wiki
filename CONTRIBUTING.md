@@ -24,7 +24,7 @@ incompatible behavior.
 
 Follow the [development setup](README.md#development-setup), then use package
 scripts as the shared interface for local work and CI. `bun run check` performs
-format, lint, type, both Knip, test, build, and package-consumer checks.
+format, lint, type, both Knip, test, build, and npm/Bun package-consumer checks.
 `bun run test:tooling` and `bun run test:hooks` verify enforcement using disposable
 fixtures. Run `bun run test:qmd:models` separately when changing semantic search
 or upgrading QMD.
@@ -65,5 +65,6 @@ exclusions, or add suppressions to make checks pass.
   TypeScript fixture builders from lint or type checking.
 
 Package verification builds and installs a local tarball in a temporary consumer.
+Follow the [release guide](docs/contributing/releases.md) for npm publication.
 Publication and external deployment are separate work; successful local checks
 do not establish that GitHub required checks or published artifacts exist.

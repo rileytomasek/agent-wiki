@@ -1,3 +1,5 @@
 [install]
 linker = "isolated"
 minimumReleaseAge = 172800
+# Our exact, source-verified snapshot must be usable during its own release.
+minimumReleaseAgeExcludes = ["@rileytomasek/qmd-snapshot"]

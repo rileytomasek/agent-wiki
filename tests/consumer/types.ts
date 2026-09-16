@@ -10,7 +10,7 @@ import type {
   ValidationResult,
   WikiFrontmatter,
   WikiSearchResult,
-} from 'agent-wiki';
+} from '@rileytomasek/agent-wiki';
 
 export function moveTypes(result: MoveResult): string | undefined {
   const first = result.plan.changes[0];
