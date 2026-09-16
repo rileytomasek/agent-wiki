@@ -2,36 +2,39 @@
 
 ## Selected artifact
 
-Both the SDK dependency and mise CLI use upstream
-[`04e4dbd8245c527a88f1a8f0bda547aef9ca81fb`](https://github.com/tobi/qmd/tree/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb),
-from QMD's `main` branch. The source manifest still says `2.8.3`; the published
-npm `2.8.3` tarball predates metadata support. A version string alone cannot prove
-this contract.
+The SDK uses the exact npm alias
+`@tobilu/qmd: npm:@rileytomasek/qmd-snapshot@2.8.3-snapshot.04e4dbd.0`.
+The snapshot and mise CLI both contain upstream
+[`04e4dbd8245c527a88f1a8f0bda547aef9ca81fb`](https://github.com/tobi/qmd/tree/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb).
+Upstream's source manifest still says `2.8.3`; the official npm `2.8.3`
+tarball predates metadata support. A version string alone cannot prove this
+contract. `tests/index-versions.test.ts` ties the alias, snapshot manifest, index
+build identity, and mise source/checksum pins together.
 
-Mise downloads the immutable source archive with SHA-256
-`60a6b1f7063aeca9262355c3422f47db2269bdb85c00a6b2a29d7fbf94561201`,
-then builds inside its installation directory with upstream's frozen Bun lock.
-This isolates QMD's own TypeScript 5.9 compiler from Agent Wiki's TypeScript 7.0.2.
-`mise.lock` records downloads for the supported Linux/macOS environments.
+The snapshot builder downloads the immutable source archive and verifies SHA-256
+`60a6b1f7063aeca9262355c3422f47db2269bdb85c00a6b2a29d7fbf94561201`.
+It builds in a temporary directory with upstream's frozen Bun lock and TypeScript
+5.9 toolchain, then packages compiled output, runtime resources, the upstream MIT
+license, and an `UPSTREAM.json` record. Runtime code and native dependencies are
+unchanged. Source-build scripts, development dependencies, and the build-only
+TypeScript peer are omitted. The CLI build stamp identifies the verified commit.
+Consumers do not need TypeScript to compile QMD or Agent Wiki's former Bun build
+patches. The [snapshot README](../../contributing/qmd-snapshot.md) explains the
+unofficial distribution.
 
-The Bun SDK dependency uses the same full Git revision. Its two-file patch changes
-only build plumbing: resolve TypeScript through the installed package layout,
-and set `rootDir: "src"` explicitly for TypeScript 7. QMD's hardcoded nested
-compiler path is incompatible with Bun's isolated linker. Agent Wiki supplies
-QMD's `@types/better-sqlite3` build declarations as a development dependency.
-The upstream runtime source is unchanged. A plain npm consumer builds the Git
-dependency with upstream's preparation script and its own dependencies; it does
-not need the repository's Bun patch, Bun runtime, or Husky.
+Mise retains the same checksum-verified upstream archive and isolated build for
+its development CLI. It is not a runtime dependency of the published library.
+`mise.lock` records downloads for supported Linux/macOS environments.
 
-The upstream TypeScript peer range remains `^5.9.3`; Bun reports the mismatch with
-the repository's 7.0.2 compiler. The strict build and fresh npm consumer with its
-own TypeScript 7 compiler are the compatibility checks. This is a temporary source
-dependency, not a reason to downgrade Agent Wiki's compiler.
+The repository's 48-hour dependency age policy remains in force for third-party
+packages. Only our exact, source-verified `@rileytomasek/qmd-snapshot` release is
+exempt so its own publication and integration checks can run immediately.
 
-When metadata support is published, select the latest release at least 48 hours
-old, replace both pins with that release, remove obsolete build adaptations,
-regenerate the lockfiles, and rerun normal checks, package consumers, and the real
-model proof. Do not change the pins to a floating branch or version selector.
+When metadata support is officially published, select a tested release at least
+48 hours old, replace the npm alias and mise pin, preserve/update the recorded
+index build identity, regenerate lockfiles, and run normal checks, fresh npm/Bun
+consumers, and the real-model proof. Retire snapshot publishing at that point;
+no consumer should import the snapshot directly or require a custom adapter.
 
 ## Public adapter boundary
 
@@ -94,7 +97,10 @@ synthetic global configuration. Each store is closed and its fixture removed.
 `test:package` packs compiled JavaScript and declarations, installs outside the
 checkout using Node/npm with no Bun on PATH, compiles a TypeScript 7 consumer with
 `skipLibCheck: false`, runs the installed executable, and repeats metadata and
-deletion operations through the package's public exports.
+deletion operations through the package's public exports. `test:package:bun`
+repeats these workflows with a fresh isolated Bun install/cache and Bun library
+execution, including the Node CLI installed by Bun. `test:qmd:models` additionally
+exercises real embeddings and hybrid search through both installed packages.
 
 `test:qmd:models` is separate from ordinary tests. The macOS/Node 24.21.0
 proof on 2026-09-16 indexed and embedded three documents through `indexWiki`

@@ -1,13 +1,24 @@
 {
-  "name": "agent-wiki",
-  "version": "0.0.0",
+  "name": "@rileytomasek/agent-wiki",
+  "version": "0.1.0",
   "description": "A local Markdown wiki library and CLI",
+  "homepage": "https://github.com/rileytomasek/agent-wiki#readme",
+  "bugs": {
+    "url": "https://github.com/rileytomasek/agent-wiki/issues"
+  },
+  "license": "MIT",
+  "author": "Riley Tomasek",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rileytomasek/agent-wiki.git"
+  },
   "bin": {
     "wiki": "./dist/cli/bin.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "type": "module",
   "main": "./dist/index.js",
@@ -18,9 +29,13 @@
       "import": "./dist/index.js"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "node node_modules/typescript/bin/tsc -p tsconfig.build.json",
-    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run knip:production && bun run test && bun run build && bun run test:package",
+    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run knip:production && bun run test && bun run build && bun run test:package && bun run test:package:bun",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint --deny-warnings --report-unused-disable-directives",
@@ -32,13 +47,19 @@
     "test:package": "node scripts/package-smoke.ts",
     "test:hooks": "node scripts/hook-smoke.ts",
     "test:tooling": "node scripts/tooling-smoke.ts",
-    "test:qmd:models": "node scripts/qmd-model-smoke.ts",
+    "test:qmd:models": "node scripts/qmd-model-smoke.ts && node scripts/package-smoke.ts --models && node scripts/package-smoke.ts --bun --models",
     "precommit": "lint-staged --concurrent false && bun run knip",
     "prepare": "node scripts/install-hooks.ts",
-    "benchmark": "node scripts/benchmark.ts"
+    "benchmark": "node scripts/benchmark.ts",
+    "test:package:bun": "node scripts/package-smoke.ts --bun",
+    "pack:release": "bun run build && node scripts/pack-release.ts",
+    "pack:qmd": "node scripts/pack-qmd.ts .cache/release/qmd",
+    "publish:release": "node scripts/publish-release.ts",
+    "publish:qmd": "node scripts/publish-release.ts --qmd",
+    "check:release": "node scripts/check-release.ts"
   },
   "dependencies": {
-    "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+    "@tobilu/qmd": "npm:@rileytomasek/qmd-snapshot@2.8.3-snapshot.04e4dbd.0",
     "github-slugger": "2.0.0",
     "mdast-util-from-markdown": "2.0.2",
     "mdast-util-frontmatter": "2.0.1",
@@ -50,7 +71,6 @@
     "yaml": "2.8.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "7.6.13",
     "@types/mdast": "4.0.4",
     "@types/node": "22.20.2",
     "fast-check": "4.10.0",
@@ -68,11 +88,8 @@
     "node": "^22.22.1 || ^24.21.0"
   },
   "packageManager": "bun@1.4.2",
-  "patchedDependencies": {
-    "@tobilu/qmd@github:tobi/qmd#04e4dbd": "patches/@tobilu%2Fqmd@github%3Atobi%2Fqmd#04e4dbd.patch"
-  },
   "trustedDependencies": [
-    "@tobilu/qmd",
+    "better-sqlite3",
     "node-llama-cpp"
   ]
 }

@@ -6,7 +6,7 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["node", "better-sqlite3"],
+    "types": ["node"],
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -18,7 +18,10 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
-    "paths": { "agent-wiki": ["./src/index.ts"] }
+    "paths": {
+      "@rileytomasek/agent-wiki": ["./src/index.ts"]
+    },
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*.ts",

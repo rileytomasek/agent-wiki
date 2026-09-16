@@ -2,8 +2,13 @@ import { strict as assert } from 'node:assert';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { indexWiki, moveDocument, searchWiki, validate } from 'agent-wiki';
-import type { WikiSearchOptions } from 'agent-wiki';
+import {
+  indexWiki,
+  moveDocument,
+  searchWiki,
+  validate,
+} from '@rileytomasek/agent-wiki';
+import type { WikiSearchOptions } from '@rileytomasek/agent-wiki';
 
 const root = resolve('workflow-wiki');
 await mkdir(root);
@@ -44,6 +49,4 @@ await indexWiki(root, indexOptions);
 const refreshed = await searchWiki(root, 'orchid', searchOptions);
 assert.equal(refreshed.documents[0]?.path, 'archive/guide.md');
 assert.equal(refreshed.documents[0].snippet.source, 'index');
-console.log(
-  `Node ${process.version}: packaged move/index/search workflow passed`
-);
+console.log(`Packaged move/index/search workflow passed`);

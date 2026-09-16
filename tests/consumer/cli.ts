@@ -47,6 +47,4 @@ command(empty, ['index']);
 const indexed = command(empty, ['status']);
 assert.ok('status' in indexed);
 assert.equal(indexed.status, 'current');
-console.log(
-  `Node ${process.version}: all eight packaged CLI commands exercised`
-);
+console.log(`All eight packaged CLI commands exercised`);

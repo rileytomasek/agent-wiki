@@ -5,7 +5,7 @@ Repository and quality policy for the [Agent Wiki architecture](../design/archit
 ## Repository and runtime
 
 - Start with one TypeScript package containing the reusable library and the `wiki` executable. Use ESM and ship compiled JavaScript plus TypeScript declarations for Node.
-- Use Bun for dependency management and package-script invocation. Keep a committed `bun.lock`, frozen CI installs with `bun ci`, the isolated linker, and a 48-hour minimum dependency release age.
+- Use Bun for dependency management and package-script invocation. Keep a committed `bun.lock`, frozen CI installs with `bun ci`, the isolated linker, and a 48-hour minimum dependency release age. The exact, checksum-verified first-party QMD snapshot is exempt during its own release; third-party dependencies retain the age requirement.
 - Pin a compatible set of Node, Bun, TypeScript, Oxlint, its type-aware engine, Oxfmt, Knip, and test-tool versions. Select the supported Node range together with the actual QMD build; test the minimum supported version and the development version.
 - Keep Bun APIs and ambient Bun types out of shipped code. Consumers must not need Bun, Husky, or other development tools to use the package.
 - Declare explicit package `exports`, `bin`, `types`, and `files` entries. Use a straightforward TypeScript build; no monorepo, build orchestrator, or release framework is needed initially.
@@ -126,13 +126,13 @@ Build a tarball and install it into a fresh temporary consumer project. Verify t
 - Packaged files include required runtime resources and omit development-only artifacts.
 - Installation and execution do not depend on workspace links, source-checkout paths, Bun globals, or development hook tooling.
 
-Packaging tests create a local artifact; publishing is a separate operation.
+Packaging tests create a local artifact; publishing is a separate operation. Repeat the consumer workflows with a fresh Bun install/cache so source-build or lifecycle assumptions cannot leak into Assistant. See the [release guide](releases.md) for publication and registry read-back.
 
 ## Scripts, Git hooks, and CI
 
 Keep package scripts as the shared interface for humans, agents, hooks, and CI. Retain familiar names such as `fmt`, `fmt:check`, `lint`, `lint:fix`, `typecheck`, and `knip`; add `knip:production`, `test`, `build`, and `test:package`.
 
-`check` runs formatting verification, lint, type checking, both Knip passes, the normal test suite once, build, and package verification. CI reporter variants may change presentation, not enforced rules.
+`check` runs formatting verification, lint, type checking, both Knip passes, the normal test suite once, build, and npm/Bun package verification. CI reporter variants may change presentation, not enforced rules.
 
 | Trigger                                 | Required behavior                                                                                                                                |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |

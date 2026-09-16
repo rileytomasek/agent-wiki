@@ -130,15 +130,16 @@ in a test data directory, not the valid example wiki.
 
 ## CLI and package
 
-| Scenario | Input or action                                                                   | Expected result                                                                                                 |
-| -------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| C01      | Global flags before/after commands and command help/version.                      | Consistent parsing and executable behavior.                                                                     |
-| C02      | Invalid arguments, ambiguous requested target, failed operation, or empty result. | Useful diagnostics and correct nonzero failures; successful empty results are distinct.                         |
-| C03      | JSON output during progress or partial results.                                   | One valid structured result on stdout; progress does not corrupt it.                                            |
-| C04      | Limits on list/search/related.                                                    | Correct document/relationship units and known truncation, with unknown search totals allowed.                   |
-| C05      | Packed library and CLI in a fresh Node consumer outside the checkout.             | Imports, declarations, help/version, and representative commands work without Bun globals or development tools. |
-| C06      | Every authored TypeScript area and every production source file.                  | Strict checking includes production source, tests, fixture builders, configuration files, and scripts.          |
-| C07      | Local hooks, CI, minimum/development Node, Linux/macOS.                           | Shared scripts enforce the same policy; report actual local/remote/platform evidence separately.                |
+| Scenario | Input or action                                                                   | Expected result                                                                                                                     |
+| -------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| C01      | Global flags before/after commands and command help/version.                      | Consistent parsing and executable behavior.                                                                                         |
+| C02      | Invalid arguments, ambiguous requested target, failed operation, or empty result. | Useful diagnostics and correct nonzero failures; successful empty results are distinct.                                             |
+| C03      | JSON output during progress or partial results.                                   | One valid structured result on stdout; progress does not corrupt it.                                                                |
+| C04      | Limits on list/search/related.                                                    | Correct document/relationship units and known truncation, with unknown search totals allowed.                                       |
+| C05      | Packed library and CLI in a fresh Node consumer outside the checkout.             | Imports, declarations, help/version, and representative commands work without Bun globals or development tools.                     |
+| C06      | Every authored TypeScript area and every production source file.                  | Strict checking includes production source, tests, fixture builders, configuration files, and scripts.                              |
+| C07      | Local hooks, CI, minimum/development Node, Linux/macOS.                           | Shared scripts enforce the same policy; report actual local/remote/platform evidence separately.                                    |
+| C08      | Fresh Bun consumer with isolated dependency installation.                         | Public declarations, all eight CLI commands, metadata filters, index/search/move, and explicit model proofs work with prebuilt QMD. |
 
 Add property tests for path normalization, graph consistency, deterministic
 projection, and move invariants with replayable seeds. Keep normal tests offline

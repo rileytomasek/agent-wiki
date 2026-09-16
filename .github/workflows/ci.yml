@@ -5,6 +5,7 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -76,4 +77,5 @@ jobs:
       - run: mise exec node@${{ matrix.node }} -- bun ci
       - run: mise exec node@${{ matrix.node }} -- bun run build
       - run: mise exec node@${{ matrix.node }} -- bun run test:package
+      - run: mise exec node@${{ matrix.node }} -- bun run test:package:bun
       - run: mise exec node@${{ matrix.node }} -- qmd --version
