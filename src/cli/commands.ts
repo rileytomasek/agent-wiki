@@ -1,0 +1,43 @@
+import type { Clock } from '../documents/dates.ts';
+import { listDocuments } from '../operations/list.ts';
+import { showDocument } from '../operations/show.ts';
+import { resolveRoot } from '../workspace/root.ts';
+import type { Arguments } from './arguments.ts';
+import {
+  listOptions,
+  rejectFilters,
+  requireOperands,
+} from './command-options.ts';
+import { renderList, renderShow } from './output.ts';
+import type { CliResult } from './output.ts';
+
+export interface CliContext {
+  readonly cwd?: string;
+  readonly clock?: Clock;
+}
+
+export async function executeCommand(
+  args: Arguments,
+  context: CliContext
+): Promise<CliResult> {
+  if (args.command !== 'show' && args.command !== 'list') {
+    throw new Error(`Command '${args.command}' is not implemented yet`);
+  }
+  requireOperands(args, args.command === 'show' ? 1 : 0);
+  if (args.command === 'show') rejectFilters(args);
+  const root = await resolveRoot({
+    cwd: context.cwd ?? process.cwd(),
+    ...(args.root === undefined ? {} : { root: args.root }),
+  });
+  const clock = context.clock === undefined ? {} : { clock: context.clock };
+  if (args.command === 'list') {
+    const result = await listDocuments(root, {
+      ...listOptions(args),
+      ...clock,
+    });
+    return renderList(result, args.json);
+  }
+  const target = args.operands[0];
+  if (target === undefined) throw new Error('show requires a target');
+  return renderShow(await showDocument(root, target, clock), args.json);
+}

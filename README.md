@@ -5,9 +5,9 @@ Agent Wiki is a small Markdown document format and a local library and
 the source of truth. Ordinary Markdown links form a reference graph, and QMD
 provides ranked search.
 
-**Current state:** the Node ESM library includes tolerant document parsing,
-root discovery, current source snapshots, and a versioned parse cache. The `wiki`
-executable supports help/version; document commands remain planned.
+**Current state:** the library and `wiki` CLI support current-file `show` and
+`list`, exact filters, and a review queue. They use tolerant document parsing,
+root discovery, current source snapshots, and a versioned parse cache.
 See the [library API](docs/design/library-api.md). Strict quality checks,
 development hooks, and CI apply throughout.
 
@@ -54,9 +54,9 @@ Node/npm consumer and needs access to dependency sources. It does not publish.
 - [Document format](docs/design/document-format.md): the authoritative field and
   content contract.
 
-The planned CLI supports `search`, `show`, `list`, `related`, `validate`,
-`index`, `status`, and `move`. It includes a review queue through `list --stale`,
-explicit search indexing, and moves that update references.
+Start with the [command guide](docs/user/commands.md) for `show` and `list`,
+including `list --stale`. `search`, `related`, `validate`, `index`, `status`, and
+`move` remain planned.
 
 ## For contributors
 

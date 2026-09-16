@@ -45,3 +45,14 @@ export type {
   WorkspaceSnapshot,
 } from './workspace/snapshots.ts';
 export type { WorkspaceIO } from './workspace/io.ts';
+export { listDocuments } from './operations/list.ts';
+export { showDocument } from './operations/show.ts';
+export { OperationError } from './operations/errors.ts';
+export type {
+  DocumentInfo,
+  DocumentFilters,
+  ReadOptions,
+  ListOptions,
+  ListResult,
+  ShowResult,
+} from './operations/types.ts';
