@@ -1,5 +1,6 @@
 import type {
   DocumentSnapshot,
+  IndexResult,
   MetadataFilter,
   SearchHit,
   SearchStore,
@@ -8,6 +9,12 @@ import type {
   ValidationResult,
   WikiFrontmatter,
 } from 'agent-wiki';
+
+export function indexTypes(result: IndexResult): number | undefined {
+  // @ts-expect-error -- Index operational results are immutable to consumers.
+  result.state.coverage.complete = false;
+  return result.state.qmd?.needsEmbedding;
+}
 
 export function referenceTypes(
   result: RelatedResult,

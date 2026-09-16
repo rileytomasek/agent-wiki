@@ -281,13 +281,17 @@ Search displays an indexed snapshot. `show` reads the current file. Avoid mainta
 6. Call QMD `embed()` to generate missing embeddings. Preserve the searchable content update if embeddings fail, and record remaining embedding work.
 7. Record completion state and release the lock.
 
-An interrupted run is safe to repeat. QMD already handles unchanged content, updated content, removed documents, and missing embeddings. Its update still scans and reads the collection even when content is unchanged, which is another reason to keep it out of ordinary searches.[^qmd-indexing]
+An interrupted run is safe to repeat after its abandoned writer lock is explicitly cleared. The lock records PID, host, and an ownership token; acquisition never steals an existing lock. Verify that the owner stopped before removing it. QMD already handles unchanged content, updated content, removed documents, and missing embeddings. Its update still scans and reads the collection even when content is unchanged, which is another reason to keep it out of ordinary searches.[^qmd-indexing]
 
 Use available SDK counts and progress callbacks. Some SDK versions expose aggregate skipped-file information rather than every underlying reason; combine that with our own source/projection diagnostics without claiming detail the API did not return.
 
 Store source fingerprints, discovery/parser/projection versions, the QMD build identity, last successful content-update time, last fully completed run, pending embedding information, and known failures in index state. This state is operational bookkeeping, not a second graph database.
 
+Record a completed QMD text reconciliation independently from the last complete source fingerprint baseline. A partial source refresh can update useful text while retaining an older baseline for conservative currency checks. Status reports dated counts from the last indexing observation, checks SQLite's file header, and hashes current sources; it does not initialize QMD merely to inspect status.
+
 `index --rebuild` recreates derived search documents and the QMD index, regenerating embeddings as needed. It does not rewrite source files or remove future external observations. It need not discard a compatible parse cache.
+
+Require complete readable source and projection coverage before removing the existing search state for a rebuild. Ordinary partial refreshes retain prior mirror copies; when those copies cannot be established, refuse the QMD update rather than letting its collection reconciliation infer deletions.
 
 ### `search` and `status`
 

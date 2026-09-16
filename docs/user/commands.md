@@ -54,6 +54,37 @@ documents. `--stale` selects deadlines today or earlier, orders oldest first,
 and reports overdue days. Undated documents stay out of the review queue.
 Editing a file does not reset its deadline.
 
+## Build and inspect the search index
+
+```sh
+wiki index --root examples/wiki
+wiki status --root examples/wiki --json
+wiki index --root examples/wiki --rebuild
+```
+
+`index` creates a dedicated search index and generates missing embeddings using
+QMD's local models. The first embedding run may download those models. Indexing
+is explicit; ordinary reads and status never start it. Authored files remain
+unchanged. Repeating the command reuses unchanged generated files and text.
+
+`status` reports whether the index exists, whether source files changed, the
+last text update, and recorded embedding work. Counts include their observation
+time; status does not reopen QMD or load inference models. Content currency and
+embedding completion are separate: searchable text can be current while
+embeddings are still pending. A due review deadline is a third, independent
+condition.
+
+Unreadable files retain their previous indexed copies. Indexing reports partial
+coverage and exits nonzero; restore readable sources and run `wiki index` again.
+Failed embedding work also leaves useful text and can be retried with the same
+command. `--rebuild` recreates only search-derived files, requires complete
+readable source coverage, and preserves separate external observations.
+
+Writers share an exclusive lock. After an interrupted process, inspect the PID
+and host in `.agent-wiki/cache/write.lock`. If that owner has stopped, remove
+that abandoned lock and rerun the command. Existing locks are never stolen by
+a timer or another process.
+
 ## Inspect references
 
 ```sh

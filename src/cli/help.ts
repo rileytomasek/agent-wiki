@@ -25,6 +25,15 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     '  --stale             Review queue: due today or earlier',
     '  --limit <number>    Positive document limit (default: unlimited)',
   ],
+  index: [
+    'index [--rebuild]',
+    'Explicitly update the search index and generate missing embeddings.',
+    '  --rebuild  Recreate search-derived state from readable source files',
+  ],
+  status: [
+    'status',
+    'Inspect index availability, source currency, and recorded coverage without models.',
+  ],
   related: [
     'related <path[#heading] | alias | attachment | URL> [--limit <number>]',
     'Inspect immediate incoming and outgoing authored references.',
@@ -58,8 +67,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list, related, validate.',
-      'Planned commands: search, index, status, move.',
+      'Available commands: show, list, related, validate, index, status.',
+      'Planned commands: search, move.',
     ]),
   ].join('\n');
 }

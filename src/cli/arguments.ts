@@ -13,6 +13,7 @@ const options = {
   path: { type: 'string' },
   stale: { type: 'boolean', default: false },
   limit: { type: 'string' },
+  rebuild: { type: 'boolean', default: false },
 } satisfies ParseArgsOptionsConfig;
 
 /** Read output mode even when strict parsing will subsequently report an error. */
@@ -37,6 +38,7 @@ export interface Arguments {
   readonly path: string | undefined;
   readonly stale: boolean;
   readonly limit: string | undefined;
+  readonly rebuild: boolean;
 }
 
 /** Node's parser accepts globals on either side of a command and honors --. */
