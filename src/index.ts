@@ -47,6 +47,24 @@ export type {
 export type { WorkspaceIO } from './workspace/io.ts';
 export { listDocuments } from './operations/list.ts';
 export { showDocument } from './operations/show.ts';
+export { related } from './operations/related.ts';
+export { validate } from './operations/validate.ts';
+export { buildGraph } from './references/graph.ts';
+export type {
+  RelatedOptions,
+  RelatedRelationship,
+  RelatedResult,
+  ValidationResult,
+} from './operations/reference-results.ts';
+export type {
+  ReferenceTarget,
+  ReferenceOccurrence,
+  ReferenceResolution,
+  ReferenceGraph,
+  GraphInput,
+  LocalTarget,
+  ExternalTarget,
+} from './references/types.ts';
 export { OperationError } from './operations/errors.ts';
 export type {
   DocumentInfo,
@@ -56,3 +74,18 @@ export type {
   ListResult,
   ShowResult,
 } from './operations/types.ts';
+export { indexWiki } from './search/index.ts';
+export { indexStatus } from './search/status.ts';
+export type {
+  IndexOptions,
+  IndexResult,
+  IndexStatusResult,
+  IndexState,
+  IndexCoverage,
+  IndexRun,
+  IndexStage,
+  IndexVersions,
+  SourceFingerprint,
+  SourceChanges,
+  TextBaseline,
+} from './search/index-types.ts';

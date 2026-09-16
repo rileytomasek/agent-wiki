@@ -4,13 +4,16 @@ import { resolve } from 'node:path';
 
 import {
   hashSource,
+  indexStatus,
   listDocuments,
   openSearchStore,
   parseDocument,
   readDocument,
   refreshWorkspace,
+  related,
   resolveRoot,
   showDocument,
+  validate,
   version,
 } from 'agent-wiki';
 
@@ -35,6 +38,9 @@ assert.equal(
   'notes.md'
 );
 assert.equal((await showDocument(wikiRoot, 'notes.md')).content, source);
+assert.equal((await indexStatus(wikiRoot)).availability, 'absent');
+assert.equal((await related(wikiRoot, 'notes.md')).total, 0);
+assert.equal((await validate(wikiRoot)).valid, true);
 const mirrorPath = resolve('mirror');
 await mkdir(mirrorPath);
 const path = 'literal café %20#[a].md';
