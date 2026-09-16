@@ -25,9 +25,10 @@ function mapHit(
   }
   if (hit.body === undefined)
     throw new Error('QMD search result is missing indexed content');
+  const title = hit.metadata['title'];
   return {
     path,
-    title: hit.title,
+    title: typeof title === 'string' ? title : hit.title,
     score: hit.score,
     metadata: hit.metadata,
     body: hit.body,
