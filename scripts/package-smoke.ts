@@ -9,8 +9,7 @@ import { prepareConsumer, verifyConsumer } from './package-consumer.ts';
 const directory = await mkdtemp(join(tmpdir(), 'agent-wiki-consumer-'));
 try {
   let artifact = process.env['AGENT_WIKI_PACKAGE'];
-  if (artifact === 'registry')
-    artifact = `${manifest.name}@${manifest.version}`;
+  if (artifact === 'registry') artifact = manifest.version;
   artifact ??= `file:${await packWiki(directory)}`;
   await prepareConsumer(directory, artifact);
   await verifyConsumer(
