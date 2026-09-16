@@ -1,6 +1,7 @@
 import type { Clock, ReviewStatus } from '../documents/dates.ts';
 import type { Diagnostic } from '../documents/types.ts';
 import type { DocumentFilters } from '../operations/types.ts';
+import type { IndexStatusResult } from './index-types.ts';
 import type { Metadata } from './metadata.ts';
 import type { SearchHit, SearchOptions, SearchStore } from './types.ts';
 
@@ -35,8 +36,12 @@ export interface SearchDocument {
 
 export interface SearchIndexNotice {
   readonly status: 'stale' | 'incomplete' | 'unknown';
+  readonly currency: IndexStatusResult['currency'];
   readonly message: string;
-  readonly recoveryCommand: 'wiki index';
+  readonly recoveryCommand:
+    | 'wiki index'
+    | 'wiki index --rebuild'
+    | 'wiki index --rebuild <selections...>';
   readonly diagnostics: readonly Diagnostic[];
 }
 

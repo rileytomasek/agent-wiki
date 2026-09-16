@@ -47,6 +47,8 @@ the saved scope. Long-running services can pass a caller-owned store from
 `openSearchStore(indexPaths(root))` to `searchWiki(root, query, { store })`;
 close it at shutdown and reopen it after a rebuild. See the
 [selection and store contracts](docs/design/library-api.md#explicit-indexing-and-status).
+The CLI accepts the same scope as `wiki index 'records/**/*.md'`; `wiki index .`
+explicitly restores the whole root, including when recovering lost scope state.
 
 ```sh
 mise exec -- bun run test          # Node/Vitest; no model downloads

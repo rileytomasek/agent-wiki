@@ -1,4 +1,5 @@
 import type { IndexResult, IndexStatusResult } from '../search/index-types.ts';
+import { indexRecoveryCommand } from '../search/recovery.ts';
 import { rendered } from './output.ts';
 import type { CliResult } from './output.ts';
 
@@ -44,7 +45,9 @@ export function renderStatus(
     `Last completed index: ${result.lastCompletedAt ?? 'never'}`,
   ];
   if (result.status !== 'current')
-    lines.push('Run wiki index to update or complete the index.');
+    lines.push(
+      `Run ${indexRecoveryCommand(result)} to update or complete the index.`
+    );
   return rendered(
     result,
     json ? JSON.stringify(result) : lines.join('\n'),

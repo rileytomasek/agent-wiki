@@ -65,7 +65,8 @@ test('missing or incompatible bookkeeping yields one unknown-state notice while 
     expect(result.documents).toHaveLength(7);
     expect(result.indexNotice).toMatchObject({
       status: 'unknown',
-      recoveryCommand: 'wiki index',
+      currency: 'unknown',
+      recoveryCommand: 'wiki index --rebuild <selections...>',
     });
     expect(result.indexNotice?.diagnostics).toHaveLength(1);
     expect(result.complete).toBe(false);

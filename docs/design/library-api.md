@@ -120,7 +120,9 @@ projection coverage before reconciling the mirror. A failed scope change retains
 the prior successful text baseline and cannot claim current currency. Incomplete
 mirror reconciliation prevents a QMD update during a scope change; the next explicit
 index retries the saved request. Missing or corrupt selection state beside an existing index
-requires explicit `indexWiki` selections rather than silently widening its scope.
+requires explicit `indexWiki` selections or `wiki index --rebuild <selections...>`
+rather than silently widening its scope. For example, `wiki index --rebuild records`
+recovers a records-only index; `wiki index --rebuild .` explicitly selects all.
 Version-one state migrates as a whole-root selection; new state uses version two.
 
 State stores the last observed QMD counts with `countsAt`, `textUpdatedAt` for a
@@ -201,7 +203,11 @@ Search adds no custom heading breadcrumbs or footnote definitions.
 
 `total` and `truncated` are `null`: QMD does not expose exhaustive totals or a
 reliable truncation signal. `indexNotice` is either `null` or one notice with
-status, recovery command, and diagnostics. `complete` describes operational
+status, source `currency`, recovery command, and diagnostics. Applications can
+render those structured fields with their own recovery instructions instead of
+parsing the display message. An unavailable database suggests a
+rebuild; missing scope state requires explicit selections in that recovery command.
+`complete` describes operational
 inspection coverage, not whether the indexed snapshot is current or exhaustive.
 A stale snapshot remains searchable. A missing index throws an actionable
 `OperationError`; search never starts document indexing or embedding work.

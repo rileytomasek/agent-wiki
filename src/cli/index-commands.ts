@@ -11,7 +11,7 @@ export async function executeIndexCommand(
   args: Arguments,
   context: CliContext
 ): Promise<CliResult> {
-  requireOperands(args, 0);
+  if (args.command === 'status') requireOperands(args, 0);
   rejectFilters(args);
   const root = await resolveRoot({
     cwd: context.cwd ?? process.cwd(),
@@ -21,6 +21,7 @@ export async function executeIndexCommand(
     return renderStatus(await indexStatus(root), args.json);
   const result = await indexWiki(root, {
     rebuild: args.rebuild,
+    ...(args.operands.length === 0 ? {} : { selections: args.operands }),
     ...(context.clock === undefined ? {} : { clock: context.clock }),
   });
   return renderIndex(result, args.json);

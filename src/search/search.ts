@@ -2,15 +2,14 @@ import { invocationDate, reviewStatus } from '../documents/dates.ts';
 import { OperationError } from '../operations/errors.ts';
 import { resultLimit } from '../operations/results.ts';
 import { indexPaths } from './index-paths.ts';
-import type { IndexStatusResult } from './index-types.ts';
 import { openSearchStore } from './qmd.ts';
 import { searchFilter } from './query-filters.ts';
 import type {
   SearchDocument,
-  SearchIndexNotice,
   WikiSearchOptions,
   WikiSearchResult,
 } from './query-types.ts';
+import { indexNotice, requireIndex } from './recovery.ts';
 import { indexStatus } from './status.ts';
 import type { SearchHit, SearchOptions } from './types.ts';
 
@@ -40,29 +39,6 @@ function searchDocument(hit: SearchHit, today: string): SearchDocument {
     ),
     snippet: { text: hit.snippet, source: 'index' },
   };
-}
-
-function indexNotice(status: IndexStatusResult): SearchIndexNotice | null {
-  if (status.status === 'current' || status.status === 'absent') return null;
-  return {
-    status: status.status,
-    message: `Search index is ${status.status}; source currency is ${status.currency}. Run wiki index to update it.`,
-    recoveryCommand: 'wiki index',
-    diagnostics: status.diagnostics,
-  };
-}
-
-function requireIndex(status: IndexStatusResult): void {
-  if (status.availability === 'absent')
-    throw new OperationError(
-      'search.index-missing',
-      'No search index exists. Run wiki index first.'
-    );
-  if (status.availability === 'unknown')
-    throw new OperationError(
-      'search.index-unavailable',
-      'The search index cannot be read. Run wiki status for details or wiki index --rebuild to recreate it.'
-    );
 }
 
 async function queryIndex(

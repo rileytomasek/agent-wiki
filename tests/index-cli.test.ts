@@ -84,7 +84,7 @@ test.each([
   ['status', '--rebuild'],
   ['list', '--rebuild'],
   ['index', '--type', 'doc/guide'],
-  ['index', 'extra'],
+  ['status', 'extra'],
 ])('index flags reject unsupported invocation %j', async (...args) => {
   const result = await runCli([...args, '--json']);
   expect(result.exitCode).toBe(1);

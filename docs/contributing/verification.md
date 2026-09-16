@@ -36,6 +36,8 @@ uncertain partial outcomes.
 `index-selection` and `index-selection-safety` exercise scoped mirrors with a
 full reference root, selected-source currency, empty matches, scope changes,
 partial scans, and recovery without accidental scope widening.
+`index-selection-cli` verifies explicit CLI recovery when scope state is missing
+or corrupt; the packaged CLI also exercises scoped indexing and an explicit reset.
 `search-owned-store` exercises repeated borrowed-store calls, failure ownership,
 and visibility of ordinary SQLite updates. The npm/Bun consumers use the same
 public selection and store APIs, including repeated hybrid calls in model checks.
