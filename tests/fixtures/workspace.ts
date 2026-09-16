@@ -13,7 +13,7 @@ export function cachePath(root: string): string {
 }
 
 export async function inWorkspace(
-  run: (fixture: WorkspaceFixture) => Promise<void>
+  run: (fixture: WorkspaceFixture) => void | Promise<void>
 ): Promise<void> {
   const root = await mkdtemp(join(tmpdir(), 'wiki-workspace-'));
   try {

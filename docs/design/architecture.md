@@ -265,7 +265,21 @@ Start with these supported capabilities. QMD has comparison, membership, existen
 
 Every returned search result must satisfy the requested filters. This does not promise the globally best filtered results or an exhaustive count: QMD's candidate windows can underfill selective queries. Preserve that contract and distinguish an unknown search total from a known complete listing.[^qmd-indexing]
 
-Normalize results around original document paths, not generated paths or QMD content IDs. Initially show QMD's best passage per document. Obtain heading context and referenced footnote definitions from the indexed document body, parsing only returned documents when needed. Use indexed metadata for display title and freshness, and derive source lines from the preserved body plus `source_body_line`. If a match falls entirely within generated metadata, do not invent a source-body location.
+Normalize results around `qmd.metadata.source_path` without URL-decoding it. Use
+QMD's native hybrid-search defaults, ranking, chunk selection, and exported
+`extractSnippet` helper. Retain the indexed `body`, `bestChunk`, and
+`bestChunkPos` through the adapter so snippet generation uses the public native
+inputs. Return the original indexed path, indexed title and metadata, QMD score,
+native snippet, and review status derived from the indexed deadline.
+
+The first release does not reconstruct heading breadcrumbs, append citation
+definitions, or promise exact original-source line numbers. Headings or citation
+text naturally present in a native snippet remain visible. If native positions
+are exposed, label them as indexed-content positions; generated metadata is part
+of that content. Do not invent original-body locations for metadata-only hits.
+Do not parse returned Markdown bodies or build a graph for search presentation.
+`source_body_line` remains projection metadata without creating a source-line
+guarantee. Rich current section inspection belongs to `show`.
 
 Search displays an indexed snapshot. `show` reads the current file. Avoid maintaining historical graph generations, reconciling each hit against changed source, or attaching stale-offset warnings to individual results.
 
@@ -295,7 +309,12 @@ Require complete readable source and projection coverage before removing the exi
 
 ### `search` and `status`
 
-Search queries the existing index without running update or embedding first. A lightweight inventory/hash comparison against the last successful source baseline can detect edits, additions, and deletions without Markdown parsing. A missing or incompatible baseline means currency is unknown, not proven current.
+Search queries the existing index without running update or generating document
+embeddings first. QMD's native query embedding and reranking remain part of
+hybrid search. A lightweight inventory/hash comparison against the last
+successful source baseline can detect edits, additions, and deletions without
+Markdown parsing. A missing or incompatible baseline means currency is unknown,
+not proven current.
 
 Emit at most one index-level notice for stale/incomplete state, with the recovery action, for example:
 

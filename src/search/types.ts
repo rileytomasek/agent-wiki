@@ -17,6 +17,12 @@ export interface SearchHit {
   readonly title: string;
   readonly score: number;
   readonly metadata: Metadata;
+  /** Indexed content retained for QMD's public snippet helper. */
+  readonly body: string;
+  readonly bestChunk?: string;
+  readonly bestChunkPos?: number;
+  /** Native QMD snippet; any positions in its header address indexed content. */
+  readonly snippet: string;
 }
 
 export interface UpdateResult {
