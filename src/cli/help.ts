@@ -44,6 +44,11 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     'Validate the whole wiki, or selected files against whole-wiki context.',
     'Quote globs so wiki can expand them relative to its root.',
   ],
+  move: [
+    'move <path | alias> <new-path.md> [--dry-run]',
+    'Move a whole document and preserve incoming and outgoing references.',
+    '  --dry-run  Preview every path and content change without authored writes',
+  ],
 };
 
 export function help(command?: string): string {
@@ -67,8 +72,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list, related, validate, index, status.',
-      'Planned commands: search, move.',
+      'Available commands: show, list, related, validate, index, status, move.',
+      'Planned commands: search.',
     ]),
   ].join('\n');
 }

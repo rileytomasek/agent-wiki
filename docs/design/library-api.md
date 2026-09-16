@@ -149,3 +149,54 @@ conservative generic URL identities. Recognized resources include the host and
 owner/repository namespace. Authored URLs and selectors stay on occurrences.
 Generic URL identities retain query parameters and fragments, including for
 non-HTTP schemes. Alias collisions are lookup ambiguity, not structural errors.
+
+## Planned document moves
+
+```ts
+import { applyMove, formatMoveDiff, moveDocument } from 'agent-wiki';
+
+const preview = await moveDocument(root, 'old.md', 'notes/new.md', {
+  dryRun: true,
+});
+console.log(formatMoveDiff(preview.plan));
+const result = await applyMove(preview.plan);
+```
+
+`moveDocument(root, from, to, { dryRun?, io? })` holds the shared writer lock
+through a current refresh, planning, and application or preview. `applyMove(plan,
+{ io? })` acquires the same lock and rechecks every discovered document hash and
+file identity. It regenerates the complete plan, rejecting omitted or altered
+edits. `buildMovePlan(workspace, from, to)` is the pure planning boundary for
+callers with an existing snapshot. Only operational entrypoints lock or write.
+
+`MovePlan` contains normalized `from`/`to`, complete file inventory, all source
+fingerprints, diagnostics, and `changes`. Each change retains original/resulting
+paths, `before`/`after` source, source hash, and deduplicated exact `SourceEdit`s.
+`formatMoveDiff` produces complete before/after hunks and rename information.
+The planner reparses projected source and verifies reference identities, origins,
+uses, and scalar styles before exposing a plan. It preserves unresolved local
+targets and refuses outgoing destinations whose meaning cannot be safely rebased.
+
+`MoveResult` has `status` (`dry-run`, `applied`, `rolled-back`, or `partial`),
+`complete`, the plan, diagnostics, recovery paths, and current per-path `files`
+states. `complete: false` always means the requested operation did not finish
+cleanly, including cleanup or lock-release failures after content was applied.
+Unrelated content diagnostics alone do not make a move incomplete.
+
+Apply stages replacements beside their destination, preserves temporary original
+files beside each source, and exclusively creates destination entries. Rechecks
+catch changed sources and newly occupied destinations; external editors do not
+honor the cooperative writer lock. Rollback never overwrites a concurrent writer.
+Partial rollback retains originals and staging files for explicit recovery, with
+original filenames embedded in backup names. No multi-file atomicity is claimed.
+Affected parses are invalidated after success; search state is left stale.
+
+Reads may follow supported in-root file symlinks. Moves refuse authored symlink
+entries, symlinked parents, and any discovered file symlink pointing at a moved
+or rewritten source. An alternate path can interpret the same changed bytes
+relative to a different directory; symlinks to unaffected files remain usable.
+
+The optional `MoveIO` seam supports deterministic filesystem-failure testing.
+Separate Linux/macOS behavior jobs exercise move failures; macOS tests establish
+that their filesystem is case-insensitive before proving case-only rename and
+reference outcomes. Those are separate from packed-consumer compatibility checks.

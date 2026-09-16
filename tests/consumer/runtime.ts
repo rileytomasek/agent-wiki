@@ -6,6 +6,8 @@ import {
   hashSource,
   indexStatus,
   listDocuments,
+  moveDocument,
+  applyMove,
   openSearchStore,
   parseDocument,
   readDocument,
@@ -41,6 +43,16 @@ assert.equal((await showDocument(wikiRoot, 'notes.md')).content, source);
 assert.equal((await indexStatus(wikiRoot)).availability, 'absent');
 assert.equal((await related(wikiRoot, 'notes.md')).total, 0);
 assert.equal((await validate(wikiRoot)).valid, true);
+const preview = await moveDocument(wikiRoot, 'notes.md', 'moved/notes.md', {
+  dryRun: true,
+});
+assert.equal(preview.status, 'dry-run');
+assert.equal((await applyMove(preview.plan)).status, 'applied');
+assert.equal((await showDocument(wikiRoot, 'moved/notes.md')).content, source);
+assert.equal(
+  (await moveDocument(wikiRoot, 'moved/notes.md', 'notes.md')).complete,
+  true
+);
 const mirrorPath = resolve('mirror');
 await mkdir(mirrorPath);
 const path = 'literal café %20#[a].md';

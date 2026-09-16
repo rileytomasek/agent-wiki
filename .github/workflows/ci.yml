@@ -18,6 +18,25 @@ env:
   HUSKY: '0'
 
 jobs:
+  move-behavior:
+    name: Move behavior (${{ matrix.os }} / Node 24.21.0)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.9.8
+          cache: false
+      - run: mise exec -- bun ci
+      - run: mise exec -- bun run test tests/move-*.test.ts
+
   quality:
     name: Quality (Linux / Node 24.21.0)
     runs-on: ubuntu-24.04

@@ -2,6 +2,7 @@ import type {
   DocumentSnapshot,
   IndexResult,
   MetadataFilter,
+  MoveResult,
   SearchHit,
   SearchStore,
   ReferenceOccurrence,
@@ -9,6 +10,17 @@ import type {
   ValidationResult,
   WikiFrontmatter,
 } from 'agent-wiki';
+
+export function moveTypes(result: MoveResult): string | undefined {
+  const first = result.plan.changes[0];
+  // @ts-expect-error -- The reviewed plan is immutable to its consumers.
+  result.plan.changes[0] = undefined;
+  if (first !== undefined) {
+    // @ts-expect-error -- Exact edit arrays are immutable to consumers.
+    first.edits = [];
+  }
+  return first?.destination;
+}
 
 export function indexTypes(result: IndexResult): number | undefined {
   // @ts-expect-error -- Index operational results are immutable to consumers.

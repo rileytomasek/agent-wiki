@@ -10,6 +10,7 @@ import {
 } from './command-options.ts';
 import { executeGraphCommand } from './graph-commands.ts';
 import { executeIndexCommand } from './index-commands.ts';
+import { executeMoveCommand } from './move-command.ts';
 import { renderList, renderShow } from './output.ts';
 import type { CliResult } from './output.ts';
 
@@ -24,6 +25,9 @@ export async function executeCommand(
 ): Promise<CliResult> {
   if (args.rebuild && args.command !== 'index')
     throw new Error(`--rebuild is not supported by ${args.command}`);
+  if (args.dryRun && args.command !== 'move')
+    throw new Error(`--dry-run is not supported by ${args.command}`);
+  if (args.command === 'move') return executeMoveCommand(args, context);
   if (args.command === 'index' || args.command === 'status')
     return executeIndexCommand(args, context);
   return executeReadCommand(args, context);
