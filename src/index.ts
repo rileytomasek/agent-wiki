@@ -1,4 +1,12 @@
 export { openSearchStore } from './search/qmd.ts';
+export { searchWiki } from './search/search.ts';
+export type {
+  SearchDocument,
+  SearchFilters,
+  SearchIndexNotice,
+  WikiSearchOptions,
+  WikiSearchResult,
+} from './search/query-types.ts';
 export type {
   EmbeddingResult,
   SearchHit,

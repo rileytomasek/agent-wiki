@@ -8,7 +8,14 @@ import type {
   RelatedResult,
   ValidationResult,
   WikiFrontmatter,
+  WikiSearchResult,
 } from 'agent-wiki';
+
+export function searchTypes(result: WikiSearchResult): string | undefined {
+  // @ts-expect-error -- Search snapshot results are immutable.
+  result.documents = [];
+  return result.documents[0]?.snippet.text;
+}
 
 export function indexTypes(result: IndexResult): number | undefined {
   // @ts-expect-error -- Index operational results are immutable to consumers.

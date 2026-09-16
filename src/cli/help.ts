@@ -10,6 +10,17 @@ const commands = new Set([
 ]);
 
 const descriptions: Readonly<Record<string, readonly string[]>> = {
+  search: [
+    'search <query> [filters] [--limit <number>]',
+    'Search the existing indexed snapshot with QMD ranking and native snippets.',
+    '  --type <value>      Exact complete type',
+    '  --category <value>  Exact first type segment',
+    '  --name <value>      Exact second type segment',
+    '  --about <path>      Exact root-relative subject path',
+    '  --stale             Review due today or earlier',
+    '  --limit <number>    Positive document limit (default: QMD native)',
+    'Snippet positions refer to indexed content. Run wiki index to refresh.',
+  ],
   show: [
     'show <path[#heading] | alias>',
     'Read current content with heading context and referenced footnotes.',
@@ -67,8 +78,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list, related, validate, index, status.',
-      'Planned commands: search, move.',
+      'Available commands: search, show, list, related, validate, index, status.',
+      'Planned commands: move.',
     ]),
   ].join('\n');
 }
