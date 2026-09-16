@@ -1,6 +1,6 @@
 {
   "name": "@rileytomasek/agent-wiki",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A local Markdown wiki library and CLI",
   "homepage": "https://github.com/rileytomasek/agent-wiki#readme",
   "bugs": {

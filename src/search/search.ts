@@ -2,15 +2,14 @@ import { invocationDate, reviewStatus } from '../documents/dates.ts';
 import { OperationError } from '../operations/errors.ts';
 import { resultLimit } from '../operations/results.ts';
 import { indexPaths } from './index-paths.ts';
-import type { IndexStatusResult } from './index-types.ts';
 import { openSearchStore } from './qmd.ts';
 import { searchFilter } from './query-filters.ts';
 import type {
   SearchDocument,
-  SearchIndexNotice,
   WikiSearchOptions,
   WikiSearchResult,
 } from './query-types.ts';
+import { indexNotice, requireIndex } from './recovery.ts';
 import { indexStatus } from './status.ts';
 import type { SearchHit, SearchOptions } from './types.ts';
 
@@ -42,42 +41,19 @@ function searchDocument(hit: SearchHit, today: string): SearchDocument {
   };
 }
 
-function indexNotice(status: IndexStatusResult): SearchIndexNotice | null {
-  if (status.status === 'current' || status.status === 'absent') return null;
-  return {
-    status: status.status,
-    message: `Search index is ${status.status}; source currency is ${status.currency}. Run wiki index to update it.`,
-    recoveryCommand: 'wiki index',
-    diagnostics: status.diagnostics,
-  };
-}
-
-function requireIndex(status: IndexStatusResult): void {
-  if (status.availability === 'absent')
-    throw new OperationError(
-      'search.index-missing',
-      'No search index exists. Run wiki index first.'
-    );
-  if (status.availability === 'unknown')
-    throw new OperationError(
-      'search.index-unavailable',
-      'The search index cannot be read. Run wiki status for details or wiki index --rebuild to recreate it.'
-    );
-}
-
 async function queryIndex(
   root: string,
   query: string,
-  options: SearchOptions,
-  search: WikiSearchOptions['search']
+  native: SearchOptions,
+  options: WikiSearchOptions
 ): Promise<readonly SearchHit[]> {
-  const store = await openSearchStore(indexPaths(root));
+  const store = options.store ?? (await openSearchStore(indexPaths(root)));
   try {
-    return search === undefined
-      ? await store.search(query, options)
-      : await search(store, query, options);
+    return options.search === undefined
+      ? await store.search(query, native)
+      : await options.search(store, query, native);
   } finally {
-    await store.close();
+    if (options.store === undefined) await store.close();
   }
 }
 
@@ -97,7 +73,7 @@ export async function searchWiki(
   const status = await indexStatus(root);
   requireIndex(status);
   try {
-    const hits = await queryIndex(root, query, native, options.search);
+    const hits = await queryIndex(root, query, native, options);
     return {
       documents: hits.map((hit) => searchDocument(hit, today)),
       total: null,

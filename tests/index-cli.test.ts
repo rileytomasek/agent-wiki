@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { stat } from 'node:fs/promises';
+import { rm, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 import { expect, test } from 'vitest';
@@ -59,11 +59,32 @@ test('incomplete indexing renders a valid result with a nonzero exit code', asyn
   });
 });
 
+test('CLI indexing reuses saved selections after their final matching source is removed', async () => {
+  await inWorkspace(async (fixture) => {
+    await fixture.write('records/one.md');
+    await fixture.write('outside.md');
+    await indexWiki(fixture.root, {
+      selections: ['records'],
+      embed: deferEmbeddings,
+    });
+    await rm(join(fixture.root, 'records/one.md'));
+    const result = await runCli(['index', '--root', fixture.root, '--json']);
+    expect(result.exitCode).toBe(0);
+    expect(readJson(result.stdout)).toMatchObject({
+      complete: true,
+      state: { selections: ['records'], qmd: { totalDocuments: 0 } },
+    });
+    expect(readCommand(fixture.root, ['status']).stdout).toContain(
+      'Index selections: records'
+    );
+  });
+});
+
 test.each([
   ['status', '--rebuild'],
   ['list', '--rebuild'],
   ['index', '--type', 'doc/guide'],
-  ['index', 'extra'],
+  ['status', 'extra'],
 ])('index flags reject unsupported invocation %j', async (...args) => {
   const result = await runCli([...args, '--json']);
   expect(result.exitCode).toBe(1);

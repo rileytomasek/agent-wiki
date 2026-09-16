@@ -18,7 +18,7 @@ does need access to dependency sources.
 | W01–W11   | `workspace-*`, `index-partial`, `index-versions`, `index-recovery`                                                     |
 | R01–R14   | `graph-*`, `external-identities`, `show*`, `list-*`, `related`, `validate`                                             |
 | T01–T05   | `list-review`, `show`, `search-filters`, `conformance-reading`                                                         |
-| Q01–Q17   | `projection-*`, `qmd-*`, `index-*`, `search-*`, `conformance-indexing`                                                 |
+| Q01–Q19   | `projection-*`, `qmd-*`, `index-*`, `search-*`, `conformance-indexing`                                                 |
 | M01–M10   | `move-*` and the packaged move/index/search workflow                                                                   |
 | C01–C07   | `cli*`, `read-cli-*`, `graph-cli-*`, `index-cli`, `search-cli`, `move-cli`, tarball consumers, enforcement scripts, CI |
 
@@ -32,6 +32,15 @@ It checks persisted incomplete state, useful indexed text, the surviving lock,
 refused automatic takeover, and explicit recovery after confirming child exit.
 Move failure tests exercise write failures, rollback, concurrent changes, and
 uncertain partial outcomes.
+
+`index-selection` and `index-selection-safety` exercise scoped mirrors with a
+full reference root, selected-source currency, empty matches, scope changes,
+partial scans, and recovery without accidental scope widening.
+`index-selection-cli` verifies explicit CLI recovery when scope state is missing
+or corrupt; the packaged CLI also exercises scoped indexing and an explicit reset.
+`search-owned-store` exercises repeated borrowed-store calls, failure ownership,
+and visibility of ordinary SQLite updates. The npm/Bun consumers use the same
+public selection and store APIs, including repeated hybrid calls in model checks.
 
 The package consumer installs the actual tarball outside the checkout, removes
 Bun from PATH, checks declarations, invokes all eight CLI commands, and exercises
@@ -107,10 +116,17 @@ persistent graph database, or mtime-only shortcuts were added.
    that cannot be preserved safely. Unrelated usable symlinks remain allowed.
 7. GitHub resource recognition is limited to `github.com`; other hosts retain
    conservative generic URL identities. No external content is fetched.
+8. Index selections persist independently of the reference root. Omission reuses
+   the saved scope; explicit `[]` restores the whole root. Missing scope state
+   requires explicit recovery instead of assuming every document should be indexed.
+9. Long-running callers own an open search store and close it at shutdown. QMD
+   retains its native model lifecycle; no store pool is introduced. Ordinary
+   updates remain visible, while rebuilding the SQLite file requires a reopen.
 
 ## Operational limits
 
-No package was published and no service deployed. Indexing remains explicit.
+Package publication and service deployment have separate read-back checks;
+local checks do not establish either outcome. Indexing remains explicit.
 The first model-dependent operation can require substantial downloads. Interrupted
 writers require the documented lock check; incomplete rollback can require manual
 recovery using reported backups.

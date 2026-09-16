@@ -37,9 +37,11 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     '  --limit <number>    Positive document limit (default: unlimited)',
   ],
   index: [
-    'index [--rebuild]',
+    'index [files | directories | globs ...] [--rebuild]',
     'Explicitly update the search index and generate missing embeddings.',
     '  --rebuild  Recreate search-derived state from readable source files',
+    'Omit selections to reuse the saved scope; use . to select the whole root.',
+    'Quote globs. Recover missing scope state with index --rebuild <selections...>.',
   ],
   status: [
     'status',

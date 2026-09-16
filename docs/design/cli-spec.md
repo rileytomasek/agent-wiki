@@ -13,7 +13,7 @@ See the [architecture](architecture.md) for component boundaries, data models, a
 | `list`                   | List documents and metadata using exact filters, ordered by path unless `--stale` is supplied.                                                                                                                    |
 | `related <target>`       | Show immediate incoming and outgoing references for a local target or external URL, distinguishing body links, citations, and named frontmatter references, with originating fields or source locations.          |
 | `validate [selections…]` | Validate the whole wiki without arguments; otherwise accept files, recursive directories, globs, and multiple selections.                                                                                         |
-| `index`                  | Update the QMD search index from current wiki files and generate missing embeddings. Report changes, skipped files, and failures. `--rebuild` recreates the search index.                                         |
+| `index [selections…]`    | Update the QMD search index from current selected wiki files and generate missing embeddings. Report changes, skipped files, and failures. `--rebuild` recreates the search index.                                |
 | `status`                 | Show the resolved root, index availability and coverage, pending embeddings, last completed update, and known indexing problems.                                                                                  |
 | `move <from> <to>`       | Move or rename a document, updating incoming Markdown and frontmatter references plus relative references inside it. Preserve unrelated content, refuse destination collisions, and support `--dry-run` previews. |
 
@@ -28,6 +28,14 @@ See the [architecture](architecture.md) for component boundaries, data models, a
 Use explicit `--root` directly, resolving relative values from the current directory. Otherwise, look for the nearest `.agent-wiki/` in the current directory or ancestors, stopping after checking the Git working-tree root. Its containing directory becomes the content root. Outside a Git working tree, check only the current directory. Without a match, use the original current directory.
 
 The marker needs no configuration; explicit roots need no marker. Exclude `.agent-wiki/` contents from document discovery. Command paths and globs resolve relative to the content root; authored references resolve relative to their containing document.
+
+Index selections accept files, recursive directories, and quoted globs without
+changing that root. Omission reuses saved index selections; `.` explicitly selects
+the whole root. New indexes default to the whole root. Empty matches are valid
+for indexing so deleted final records can be removed. Status and search currency
+inspect the saved selection. If scope state is missing or corrupt beside an
+existing index, require an explicit selection for recovery, such as
+`wiki index --rebuild records` or `wiki index --rebuild .`; never silently widen it.
 
 ## Validation and freshness
 

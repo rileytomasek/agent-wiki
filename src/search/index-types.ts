@@ -22,6 +22,7 @@ export interface IndexVersions {
 
 export interface TextBaseline {
   readonly at: string;
+  readonly selections: readonly string[];
   readonly versions: IndexVersions;
   readonly sources: readonly SourceFingerprint[];
 }
@@ -47,7 +48,8 @@ export interface IndexRun {
 }
 
 export interface IndexState {
-  readonly version: 1;
+  readonly version: 2;
+  readonly selections: readonly string[];
   readonly baseline: TextBaseline | null;
   readonly textUpdatedAt: string | null;
   readonly lastCompletedAt: string | null;
@@ -59,6 +61,8 @@ export interface IndexState {
 }
 
 export interface IndexOptions {
+  /** Root-relative files, directories or globs. Omit to reuse saved selections; [] selects all. */
+  readonly selections?: readonly string[];
   readonly rebuild?: boolean;
   readonly clock?: Clock;
   readonly io?: WorkspaceIO;
@@ -83,6 +87,7 @@ export interface SourceChanges {
 
 export interface IndexStatusResult {
   readonly root: string;
+  readonly selections: readonly string[] | null;
   readonly status: 'absent' | 'current' | 'stale' | 'unknown' | 'incomplete';
   readonly availability: 'absent' | 'present' | 'unknown';
   readonly currency: 'current' | 'stale' | 'unknown';

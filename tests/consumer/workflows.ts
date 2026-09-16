@@ -3,8 +3,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import {
+  indexPaths,
   indexWiki,
   moveDocument,
+  openSearchStore,
   searchWiki,
   validate,
 } from '@rileytomasek/agent-wiki';
@@ -49,4 +51,20 @@ await indexWiki(root, indexOptions);
 const refreshed = await searchWiki(root, 'orchid', searchOptions);
 assert.equal(refreshed.documents[0]?.path, 'archive/guide.md');
 assert.equal(refreshed.documents[0].snippet.source, 'index');
+const selected = await indexWiki(root, {
+  ...indexOptions,
+  selections: ['archive'],
+});
+assert.equal(selected.state.coverage.discovered, 1);
+assert.deepEqual(selected.state.selections, ['archive']);
+const store = await openSearchStore(indexPaths(root));
+try {
+  const ownedOptions = { ...searchOptions, store };
+  const first = await searchWiki(root, 'orchid', ownedOptions);
+  const repeated = await searchWiki(root, 'orchid', ownedOptions);
+  assert.equal(first.documents[0]?.path, 'archive/guide.md');
+  assert.deepEqual(repeated, first);
+} finally {
+  await store.close();
+}
 console.log(`Packaged move/index/search workflow passed`);

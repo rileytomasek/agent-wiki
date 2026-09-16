@@ -1,73 +1,14 @@
 import { operationProblem } from '../workspace/io.ts';
-import { refreshWorkspace } from '../workspace/snapshots.ts';
 import { databaseExists, indexPaths } from './index-paths.ts';
+import { prepareIndex } from './index-prepare.ts';
+import { checkpoint, indexTime, type IndexProgress } from './index-progress.ts';
 import { beginState, indexVersions, writeIndexState } from './index-state.ts';
 import type { IndexOptions, IndexResult, IndexState } from './index-types.ts';
-import { prepareMirror } from './mirror-projection.ts';
-import { reconcileMirror } from './mirror.ts';
 import { openSearchStore } from './qmd.ts';
-import { rebuildSearch } from './rebuild.ts';
 import type { SearchStore } from './types.ts';
 
-interface Progress {
-  readonly root: string;
-  readonly options: IndexOptions;
-  state: IndexState;
-  update: IndexResult['update'];
-  embedding: IndexResult['embedding'];
-}
-
-function now(options: IndexOptions): string {
-  return (options.clock?.() ?? new Date()).toISOString();
-}
-
-async function checkpoint(
-  progress: Progress,
-  stage: IndexState['run']['stage']
-): Promise<void> {
-  progress.state = { ...progress.state, run: { ...progress.state.run, stage } };
-  await writeIndexState(progress.root, progress.state);
-}
-
-async function prepare(progress: Progress) {
-  const { root, options } = progress;
-  const workspace = await refreshWorkspace(
-    root,
-    options.io === undefined ? {} : { io: options.io }
-  );
-  const prepared = prepareMirror(workspace);
-  progress.state = {
-    ...progress.state,
-    coverage: prepared.coverage,
-    diagnostics: prepared.diagnostics,
-  };
-  if (options.rebuild === true && !prepared.coverage.complete) {
-    throw new Error(
-      'Rebuild requires complete source and projection coverage; the existing index was preserved'
-    );
-  }
-  await checkpoint(progress, 'mirror');
-  if (options.rebuild === true) await rebuildSearch(root);
-  const mirror = await reconcileMirror(
-    indexPaths(root).mirrorPath,
-    workspace,
-    prepared,
-    progress.state.baseline
-  );
-  progress.state = {
-    ...progress.state,
-    coverage: mirror.coverage,
-    diagnostics: mirror.diagnostics,
-  };
-  if (!mirror.safeToUpdate)
-    throw new Error(
-      'The index could not safely reconcile incomplete source coverage'
-    );
-  return prepared.sources;
-}
-
 async function updateText(
-  progress: Progress,
+  progress: IndexProgress,
   store: SearchStore
 ): Promise<boolean> {
   progress.update = await store.update();
@@ -92,15 +33,18 @@ async function updateText(
   progress.state = {
     ...progress.state,
     qmd,
-    countsAt: now(progress.options),
-    textUpdatedAt: now(progress.options),
+    countsAt: indexTime(progress.options),
+    textUpdatedAt: indexTime(progress.options),
     diagnostics,
     coverage: { ...progress.state.coverage, complete },
   };
   return complete;
 }
 
-async function embed(progress: Progress, store: SearchStore): Promise<boolean> {
+async function embed(
+  progress: IndexProgress,
+  store: SearchStore
+): Promise<boolean> {
   try {
     progress.embedding = await (progress.options.embed?.(store) ??
       store.embed());
@@ -108,7 +52,7 @@ async function embed(progress: Progress, store: SearchStore): Promise<boolean> {
     progress.state = {
       ...progress.state,
       qmd: await store.status(),
-      countsAt: now(progress.options),
+      countsAt: indexTime(progress.options),
     };
   }
   const qmd = progress.state.qmd;
@@ -134,8 +78,8 @@ async function embed(progress: Progress, store: SearchStore): Promise<boolean> {
   return complete;
 }
 
-async function execute(progress: Progress): Promise<void> {
-  const sources = await prepare(progress);
+async function execute(progress: IndexProgress): Promise<void> {
+  const sources = await prepareIndex(progress);
   await checkpoint(progress, 'update');
   await databaseExists(progress.root);
   const store = await openSearchStore(indexPaths(progress.root));
@@ -145,7 +89,8 @@ async function execute(progress: Progress): Promise<void> {
       progress.state = {
         ...progress.state,
         baseline: {
-          at: now(progress.options),
+          at: indexTime(progress.options),
+          selections: progress.state.selections,
           versions: indexVersions,
           sources,
         },
@@ -159,7 +104,7 @@ async function execute(progress: Progress): Promise<void> {
   progress.state = {
     ...progress.state,
     lastCompletedAt: complete
-      ? now(progress.options)
+      ? indexTime(progress.options)
       : progress.state.lastCompletedAt,
   };
   await checkpoint(progress, complete ? 'complete' : 'failed');
@@ -170,10 +115,10 @@ export async function runIndex(
   options: IndexOptions,
   previous: IndexState | null
 ): Promise<IndexResult> {
-  const progress: Progress = {
+  const progress: IndexProgress = {
     root,
     options,
-    state: beginState(previous, now(options)),
+    state: beginState(previous, indexTime(options), options.selections ?? []),
     update: null,
     embedding: null,
   };

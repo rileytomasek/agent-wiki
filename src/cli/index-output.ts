@@ -1,6 +1,14 @@
 import type { IndexResult, IndexStatusResult } from '../search/index-types.ts';
+import { indexRecoveryCommand } from '../search/recovery.ts';
 import { rendered } from './output.ts';
 import type { CliResult } from './output.ts';
+
+function selectionSummary(selections: readonly string[] | null): string {
+  if (selections === null) return 'unknown';
+  return selections.length === 0
+    ? 'all Markdown documents'
+    : selections.join(', ');
+}
 
 export function renderIndex(result: IndexResult, json: boolean): CliResult {
   const update = result.update;
@@ -11,6 +19,7 @@ export function renderIndex(result: IndexResult, json: boolean): CliResult {
   const pending = result.state.qmd?.needsEmbedding;
   const lines = [
     `Index ${result.complete ? 'complete' : 'incomplete'}: ${result.root}`,
+    `Index selections: ${selectionSummary(result.state.selections)}`,
     changes,
     `Source coverage: ${result.state.coverage.readable}/${result.state.coverage.discovered} readable; ${result.state.coverage.projected} projected.`,
     `Pending embeddings: ${pending ?? 'unknown'}.`,
@@ -29,13 +38,16 @@ export function renderStatus(
   const lines = [
     `Root: ${result.root}`,
     `Search index: ${result.status}`,
+    `Index selections: ${selectionSummary(result.selections)}`,
     `Source currency: ${result.currency}`,
     `Pending embeddings: ${result.pendingEmbeddings ?? 'unknown'} (recorded ${result.countsAt ?? 'never'}).`,
     `Last text update: ${result.lastTextUpdate ?? 'never'}`,
     `Last completed index: ${result.lastCompletedAt ?? 'never'}`,
   ];
   if (result.status !== 'current')
-    lines.push('Run wiki index to update or complete the index.');
+    lines.push(
+      `Run ${indexRecoveryCommand(result)} to update or complete the index.`
+    );
   return rendered(
     result,
     json ? JSON.stringify(result) : lines.join('\n'),

@@ -62,12 +62,19 @@ Editing a file does not reset its deadline.
 wiki index --root examples/wiki
 wiki status --root examples/wiki --json
 wiki index --root examples/wiki --rebuild
+wiki index 'records/**/*.md' --root /path/to/repository
 ```
 
 `index` creates a dedicated search index and generates missing embeddings using
 QMD's local models. The first embedding run may download those models. Indexing
 is explicit; ordinary reads and status never start it. Authored files remain
 unchanged. Repeating the command reuses unchanged generated files and text.
+
+Optional selections are root-relative files, recursive directories, or quoted
+globs. They limit indexing while the full root remains available for current
+reads and reference validation. Later `index` calls reuse the saved scope;
+`wiki index .` explicitly selects every discovered Markdown document. Empty
+matches are valid, including after the last selected record has been removed.
 
 `status` reports whether the index exists, whether source files changed, the
 last text update, and recorded embedding work. Counts include their observation
@@ -81,6 +88,12 @@ coverage and exits nonzero; restore readable sources and run `wiki index` again.
 Failed embedding work also leaves useful text and can be retried with the same
 command. `--rebuild` recreates only search-derived files, requires complete
 readable source coverage, and preserves separate external observations.
+
+If saved selection state is missing or corrupt beside an existing index, recovery
+requires an explicit choice: use `wiki index --rebuild records` for the records
+directory, or `wiki index --rebuild .` for the entire root. The CLI does not guess
+the old scope and silently add unrelated documents. Status reports the saved
+selections, or `unknown` when they cannot be recovered.
 
 Writers share an exclusive lock. After an interrupted process, inspect the PID
 and host in `.agent-wiki/cache/write.lock`. Confirm that the owner has stopped

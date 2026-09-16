@@ -1,4 +1,5 @@
 import { normalizeWikiPath } from '../documents/paths.ts';
+import { normalizeSelections } from '../operations/selections.ts';
 import { arrayOf, isDiagnostic, isRecord } from '../workspace/cache-shapes.ts';
 import type {
   IndexCoverage,
@@ -20,6 +21,16 @@ function timestamp(value: unknown): value is string {
 
 function nullableTimestamp(value: unknown): boolean {
   return value === null || timestamp(value);
+}
+
+function isSelections(value: unknown): value is readonly string[] {
+  if (!arrayOf(value, (item): item is string => typeof item === 'string'))
+    return false;
+  try {
+    return JSON.stringify(normalizeSelections(value)) === JSON.stringify(value);
+  } catch {
+    return false;
+  }
 }
 
 function isVersions(value: unknown): value is IndexVersions {
@@ -47,6 +58,7 @@ function isBaseline(value: unknown): value is TextBaseline {
   return (
     isRecord(value) &&
     timestamp(value['at']) &&
+    isSelections(value['selections']) &&
     isVersions(value['versions']) &&
     arrayOf(value['sources'], isFingerprint)
   );
@@ -93,13 +105,29 @@ function optionalRecords(value: Readonly<Record<string, unknown>>): boolean {
   );
 }
 
-export function isIndexState(value: unknown): value is IndexState {
+function isIndexState(value: unknown): value is IndexState {
   return (
     isRecord(value) &&
-    value['version'] === 1 &&
+    value['version'] === 2 &&
+    isSelections(value['selections']) &&
     optionalRecords(value) &&
     isCoverage(value['coverage']) &&
     isRun(value['run']) &&
     arrayOf(value['diagnostics'], isDiagnostic)
   );
+}
+
+/** Version one always indexed the entire root. Upgrade without changing its scope. */
+export function parseIndexState(value: unknown): IndexState | undefined {
+  if (isRecord(value) && value['version'] === 1) {
+    const baseline = value['baseline'];
+    const upgraded = {
+      ...value,
+      version: 2,
+      selections: [],
+      baseline: isRecord(baseline) ? { ...baseline, selections: [] } : baseline,
+    };
+    return isIndexState(upgraded) ? upgraded : undefined;
+  }
+  return isIndexState(value) ? value : undefined;
 }

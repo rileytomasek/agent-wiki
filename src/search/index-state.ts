@@ -8,7 +8,7 @@ import { inspectPath, operationProblem } from '../workspace/io.ts';
 import { indexPaths } from './index-paths.ts';
 import type { IndexState, IndexVersions } from './index-types.ts';
 import { PROJECTION_VERSION, QMD_BUILD } from './projection.ts';
-import { isIndexState } from './state-guards.ts';
+import { parseIndexState } from './state-guards.ts';
 
 export interface StateRead {
   readonly state: IndexState | null;
@@ -31,9 +31,10 @@ export async function readIndexState(root: string): Promise<StateRead> {
     if (info === null) return { state: null, diagnostics: [] };
     if (!info.isFile()) throw new Error('Index state must be a regular file');
     const value: unknown = JSON.parse(await readFile(path, 'utf8'));
-    if (!isIndexState(value))
+    const state = parseIndexState(value);
+    if (state === undefined)
       throw new Error('Index state is invalid or incompatible');
-    return { state: value, diagnostics: [] };
+    return { state, diagnostics: [] };
   } catch (error) {
     return {
       state: null,
@@ -52,16 +53,19 @@ export async function writeIndexState(
 
 export function beginState(
   previous: IndexState | null,
-  at: string
+  at: string,
+  selections: readonly string[]
 ): IndexState {
   if (previous !== null)
     return {
       ...previous,
+      selections,
       run: { startedAt: at, stage: 'refresh' },
       diagnostics: [],
     };
   return {
-    version: 1,
+    version: 2,
+    selections,
     baseline: null,
     textUpdatedAt: null,
     lastCompletedAt: null,
