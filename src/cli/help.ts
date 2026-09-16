@@ -25,6 +25,16 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     '  --stale             Review queue: due today or earlier',
     '  --limit <number>    Positive document limit (default: unlimited)',
   ],
+  related: [
+    'related <path[#heading] | alias | attachment | URL> [--limit <number>]',
+    'Inspect immediate incoming and outgoing authored references.',
+    '  --limit <number>    Positive relationship limit (default: unlimited)',
+  ],
+  validate: [
+    'validate [files | directories | globs ...]',
+    'Validate the whole wiki, or selected files against whole-wiki context.',
+    'Quote globs so wiki can expand them relative to its root.',
+  ],
 };
 
 export function help(command?: string): string {
@@ -48,8 +58,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list.',
-      'Planned commands: search, related, validate, index, status, move.',
+      'Available commands: show, list, related, validate.',
+      'Planned commands: search, index, status, move.',
     ]),
   ].join('\n');
 }

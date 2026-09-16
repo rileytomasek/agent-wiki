@@ -35,11 +35,22 @@ export function requireOperands(args: Arguments, count: number): void {
 }
 
 export function rejectFilters(args: Arguments): void {
+  rejectDocumentFilters(args);
+  if (args.limit !== undefined)
+    throw new Error(`--limit is not supported by ${args.command}`);
+}
+
+export function relationshipOptions(args: Arguments): {
+  readonly limit?: number;
+} {
+  rejectDocumentFilters(args);
+  return args.limit === undefined ? {} : { limit: parseLimit(args.limit) };
+}
+
+function rejectDocumentFilters(args: Arguments): void {
   const filter = filterNames.find((name) => args[name] !== undefined);
   if (filter !== undefined)
     throw new Error(`--${filter} is not supported by ${args.command}`);
   if (args.stale)
     throw new Error(`--stale is not supported by ${args.command}`);
-  if (args.limit !== undefined)
-    throw new Error(`--limit is not supported by ${args.command}`);
 }
