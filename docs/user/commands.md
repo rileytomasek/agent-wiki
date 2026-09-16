@@ -87,6 +87,27 @@ before removing that abandoned lock. For an interrupted move, first inspect and
 restore any retained originals described below. Existing locks are never stolen
 by a timer or another process.
 
+## Search the indexed snapshot
+
+```sh
+wiki search 'deployment rollback' --root examples/wiki
+wiki search 'website' --root examples/wiki --type doc/guide --limit 5 --json
+wiki search 'website' --root examples/wiki --about projects/website.md --stale
+```
+
+Search uses QMD's native hybrid ranking, scores, and snippets. Exact `--type`,
+`--category`, `--name`, `--about`, and `--stale` filters combine with AND. A limit
+counts documents; without one, QMD's default applies. Selective filters can return
+fewer documents than the limit because retrieval uses a bounded candidate window.
+Search has no path-glob filter, and JSON reports unknown totals as `null`.
+
+Results retain the original indexed paths, titles, metadata, and review dates.
+Native snippets may include generated metadata; their header positions refer to
+indexed content. Use `show` for current text, section context, and referenced
+footnotes. After editing or moving files, snapshot hits remain usable and one
+index-level notice directs you to `wiki index`. Search never refreshes documents
+or the index implicitly. Query embedding and reranking can load QMD's local models.
+
 ## Inspect references
 
 ```sh

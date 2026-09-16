@@ -14,6 +14,7 @@ import {
   refreshWorkspace,
   related,
   resolveRoot,
+  searchWiki,
   showDocument,
   validate,
   version,
@@ -53,6 +54,9 @@ assert.equal(
   (await moveDocument(wikiRoot, 'moved/notes.md', 'notes.md')).complete,
   true
 );
+await assert.rejects(searchWiki(wikiRoot, 'orchid'), {
+  code: 'search.index-missing',
+});
 const mirrorPath = resolve('mirror');
 await mkdir(mirrorPath);
 const path = 'literal café %20#[a].md';
@@ -74,6 +78,7 @@ try {
     filter: { key: 'type', operator: 'eq', value: 'doc/guide' },
   });
   assert.equal(hits[0]?.path, path);
+  assert.ok(hits[0].snippet.includes('orchid'));
   assert.equal((await store.status()).needsEmbedding, 1);
   await rm(documentPath);
   assert.equal((await store.update()).removed, 1);

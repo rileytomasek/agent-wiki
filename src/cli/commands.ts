@@ -1,22 +1,18 @@
 import type { Clock } from '../documents/dates.ts';
-import { listDocuments } from '../operations/list.ts';
-import { showDocument } from '../operations/show.ts';
+import type { WikiSearchOptions } from '../search/query-types.ts';
 import { resolveRoot } from '../workspace/root.ts';
 import type { Arguments } from './arguments.ts';
-import {
-  listOptions,
-  rejectFilters,
-  requireOperands,
-} from './command-options.ts';
 import { executeGraphCommand } from './graph-commands.ts';
 import { executeIndexCommand } from './index-commands.ts';
+import { executeInspectionCommand } from './inspection-commands.ts';
 import { executeMoveCommand } from './move-command.ts';
-import { renderList, renderShow } from './output.ts';
 import type { CliResult } from './output.ts';
+import { executeSearchCommand } from './search-command.ts';
 
 export interface CliContext {
   readonly cwd?: string;
   readonly clock?: Clock;
+  readonly search?: WikiSearchOptions['search'];
 }
 
 export async function executeCommand(
@@ -30,6 +26,7 @@ export async function executeCommand(
   if (args.command === 'move') return executeMoveCommand(args, context);
   if (args.command === 'index' || args.command === 'status')
     return executeIndexCommand(args, context);
+  if (args.command === 'search') return executeSearchCommand(args, context);
   return executeReadCommand(args, context);
 }
 
@@ -47,24 +44,4 @@ async function executeReadCommand(
   if (args.command === 'related' || args.command === 'validate')
     return executeGraphCommand(args, root);
   return executeInspectionCommand(args, root, context);
-}
-
-async function executeInspectionCommand(
-  args: Arguments,
-  root: string,
-  context: CliContext
-): Promise<CliResult> {
-  requireOperands(args, args.command === 'show' ? 1 : 0);
-  if (args.command === 'show') rejectFilters(args);
-  const clock = context.clock === undefined ? {} : { clock: context.clock };
-  if (args.command === 'list') {
-    const result = await listDocuments(root, {
-      ...listOptions(args),
-      ...clock,
-    });
-    return renderList(result, args.json);
-  }
-  const target = args.operands[0];
-  if (target === undefined) throw new Error('show requires a target');
-  return renderShow(await showDocument(root, target, clock), args.json);
 }

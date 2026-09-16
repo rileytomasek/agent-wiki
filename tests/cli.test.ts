@@ -56,7 +56,7 @@ test('argument boundaries preserve literals and diagnose invalid options', async
 });
 
 test('unavailable and unknown commands fail honestly with separated output', async () => {
-  const result = await runCli(['search', 'query']);
+  const result = await runCli(['move', 'source.md', 'destination.md']);
   expect(result).toMatchObject({ stdout: '', exitCode: 1 });
   expect(result.stderr).toContain('not implemented yet');
   expect((await runCli(['typo'])).stderr).toContain('Unknown command: typo');

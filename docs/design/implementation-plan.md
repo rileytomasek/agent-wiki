@@ -122,15 +122,21 @@ ranking/candidate limits. Do not add exhaustive filtered retrieval, repeated
 post-filtering, or search path globs. Every returned result must satisfy the
 filters; selective queries may return fewer documents than requested.
 
-Return one best passage per document initially, original paths, indexed title and
-review metadata, heading context, and relevant footnotes from the indexed body.
-Map body locations using the preserved source offset information; generated
-metadata matches must not acquire invented body positions.
+Use native QMD hybrid-search defaults and the exported `extractSnippet` helper
+for one snippet per returned document. Preserve indexed body, best chunk, and
+chunk position through the adapter. Return exact original paths from metadata
+without URL decoding, indexed title and metadata, QMD scores, and review status.
+Optional positions describe indexed content. Defer custom heading breadcrumbs,
+automatic citation-definition expansion, and exact original-source locations;
+do not add Markdown parsing or graph reconstruction to search presentation.
 
-Check index currency without parsing all Markdown or updating the index. Emit one
+Check index currency without parsing Markdown or updating the index. Emit one
 index-level stale/incomplete notice with the recovery command, represented once
 in JSON. Search reads the indexed snapshot; `show` reads current source. Keep that
 simple distinction instead of maintaining per-result version reconciliation.
+Native query embeddings and reranking are permitted; document embedding and
+index updates remain explicit. Verify this thin integration with a separate real
+embedding/hybrid-search smoke test while keeping ordinary tests model-free.
 
 ## Implement safe moves
 

@@ -125,6 +125,29 @@ an interrupted writer, the operator verifies that the owner stopped, removes the
 abandoned lock, and retries. This avoids time-based lease expiry or racy automatic
 lock takeover. Release verifies that ownership has not changed.
 
+## Snapshot search
+
+`searchWiki(root, query, { filters?, limit?, clock?, search? })` uses QMD's
+native hybrid search by default. Exact type/category/name/about and review
+deadline filters combine with AND. QMD owns candidate selection, ranking,
+chunking, and the default result limit. The optional `search` callback is an
+integration seam for deterministic offline tests using the same store's lexical
+search; it is not a second retrieval engine.
+
+Results contain `documents` with original indexed path, title, score, metadata,
+review status, and `{ text, source: 'index' }` snippets. The adapter calls QMD's
+public `extractSnippet` with its indexed body and native chunk information.
+Snippet header positions address indexed content, including generated metadata.
+Search adds no custom heading breadcrumbs or footnote definitions.
+
+`total` and `truncated` are `null`: QMD does not expose exhaustive totals or a
+reliable truncation signal. `indexNotice` is either `null` or one notice with
+status, recovery command, and diagnostics. `complete` describes operational
+inspection coverage, not whether the indexed snapshot is current or exhaustive.
+A stale snapshot remains searchable. A missing index throws an actionable
+`OperationError`; search never starts document indexing or embedding work.
+Normal query embeddings and reranking remain part of native hybrid search.
+
 ## Relationships and validation
 
 `buildGraph(workspace)` is a pure operation over normalized snapshots and file

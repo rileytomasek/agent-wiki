@@ -5,9 +5,9 @@ Agent Wiki is a small Markdown document format and a local library and
 the source of truth. Ordinary Markdown links form a reference graph, and QMD
 provides ranked search.
 
-**Current state:** the library and `wiki` CLI support current-file `show`, `list`,
-`related`, and `validate`, exact filters, a review queue, explicit `index`,
-read-only `status`, and planned, reference-preserving `move`.
+**Current state:** the library and `wiki` CLI implement `search`, `show`, `list`,
+`related`, `validate`, `index`, `status`, and `move`, including exact filters,
+a review queue, and moves with precise reference updates.
 They use tolerant document parsing, current source snapshots, a versioned parse
 cache, and a dedicated QMD index with deterministic generated metadata.
 See the [library API](docs/design/library-api.md). Strict quality checks,
@@ -36,7 +36,8 @@ explicit absolute paths. Its mirror contains generated `qmd.metadata`, including
 `source_path`. It provides update, lexical/hybrid search, embedding, status, and
 cleanup. `indexWiki(root)` coordinates source refresh, projection, text updates,
 and missing embeddings; `indexStatus(root)` inspects source currency and recorded
-coverage without loading QMD or models.
+coverage without loading QMD or models. `searchWiki(root, query)` searches that
+snapshot with QMD's native hybrid ranking, filters, scores, and snippets.
 See the [QMD integration contract](docs/design/references/qmd-integration.md).
 
 ```sh
@@ -58,8 +59,8 @@ Node/npm consumer and needs access to dependency sources. It does not publish.
 - [Document format](docs/design/document-format.md): the authoritative field and
   content contract.
 
-Start with the [command guide](docs/user/commands.md) for inspection, review, and
-search indexing, and safe document moves. `search` remains planned.
+Start with the [command guide](docs/user/commands.md) for inspection, review,
+search indexing, and safe document moves.
 
 ## For contributors
 

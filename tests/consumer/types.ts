@@ -9,6 +9,7 @@ import type {
   RelatedResult,
   ValidationResult,
   WikiFrontmatter,
+  WikiSearchResult,
 } from 'agent-wiki';
 
 export function moveTypes(result: MoveResult): string | undefined {
@@ -20,6 +21,12 @@ export function moveTypes(result: MoveResult): string | undefined {
     first.edits = [];
   }
   return first?.destination;
+}
+
+export function searchTypes(result: WikiSearchResult): string | undefined {
+  // @ts-expect-error -- Search snapshot results are immutable.
+  result.documents = [];
+  return result.documents[0]?.snippet.text;
 }
 
 export function indexTypes(result: IndexResult): number | undefined {
