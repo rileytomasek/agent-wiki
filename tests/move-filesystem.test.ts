@@ -11,6 +11,8 @@ import { join } from 'node:path';
 import { expect, test } from 'vitest';
 
 import { applyMove, moveDocument } from '../src/operations/move.ts';
+import { related } from '../src/operations/related.ts';
+import { showDocument } from '../src/operations/show.ts';
 import { validate } from '../src/operations/validate.ts';
 import { readCache } from '../src/workspace/cache.ts';
 import { inWorkspace } from './fixtures/workspace.ts';
@@ -171,5 +173,24 @@ test('a symlink to a rewritten referrer cannot acquire different relative-link m
     expect(await readFile(join(root, 'ref.md'), 'utf8')).toBe(
       '# R\n\n[A](a.md)\n'
     );
+  });
+});
+
+test('real path and heading targets take priority over a conflicting full alias', async () => {
+  await inWorkspace(async ({ root, write }) => {
+    await write('a.md', '# A\n\n## Part\n');
+    await write('b.md', '---\naliases: ["a.md#part"]\n---\n# B\n');
+    const shown = await showDocument(root, 'a.md#part');
+    expect(shown.document.path).toBe('a.md');
+    expect(shown.section?.anchor).toBe('part');
+    expect((await related(root, 'a.md#part')).target).toMatchObject({
+      kind: 'section',
+      path: 'a.md',
+      anchor: 'part',
+    });
+    await expect(
+      moveDocument(root, 'a.md#part', 'new.md', { dryRun: true })
+    ).rejects.toThrow('whole Markdown document');
+    expect(await readFile(join(root, 'b.md'), 'utf8')).toContain('# B\n');
   });
 });

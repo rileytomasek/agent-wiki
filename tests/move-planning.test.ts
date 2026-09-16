@@ -91,11 +91,11 @@ test('unchanged relative and external destinations retain their bytes', () => {
 test('explicit path-shaped aliases are safe and literal paths take priority', () => {
   const workspace = moveWorkspace({
     'a.md':
-      '---\naliases: [/Alex, "a.md#part", "https://example.com/alex"]\n---\n# A\n',
+      '---\naliases: [/Alex, "Alex#part", "https://example.com/alex"]\n---\n# A\n',
     'a.md#part.md': '# Literal\n',
   });
   expect(buildMovePlan(workspace, '/Alex', 'new.md').from).toBe('a.md');
-  expect(buildMovePlan(workspace, 'a.md#part', 'new.md').from).toBe('a.md');
+  expect(buildMovePlan(workspace, 'Alex#part', 'new.md').from).toBe('a.md');
   expect(
     buildMovePlan(workspace, 'https://example.com/alex', 'new.md').from
   ).toBe('a.md');

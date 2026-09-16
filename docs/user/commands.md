@@ -24,8 +24,9 @@ wiki show 'guides/deployment.md#deploy' --root examples/wiki
 ```
 
 Targets are exact root-relative paths or declared aliases. A literal filename
-wins when it exists, followed by an exact declared alias; `#heading` selects a
-heading anchor otherwise. Filenames are
+wins when it exists, followed by a real document path with a `#heading` anchor.
+Otherwise, an exact declared alias wins before interpreting an alias with a
+heading suffix. Filenames are
 not URI-decoded. Ambiguous aliases report all candidate paths. Lookup does not
 guess files from their basenames.
 
