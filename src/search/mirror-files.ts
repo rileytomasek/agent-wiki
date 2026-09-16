@@ -1,4 +1,4 @@
-import { readFile, rm } from 'node:fs/promises';
+import { readFile, rm, rmdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
 import { normalizeWikiPath } from '../documents/paths.ts';
@@ -46,5 +46,26 @@ export async function removeMirrorDocument(
   root: string,
   path: string
 ): Promise<void> {
-  await rm(await mirrorFile(root, path), { force: true });
+  const file = await mirrorFile(root, path);
+  await rm(file, { force: true });
+  await removeEmptyParents(root, dirname(file));
+}
+
+async function removeEmptyParents(
+  root: string,
+  directory: string
+): Promise<void> {
+  if (directory === root) return;
+  try {
+    await rmdir(directory);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      'code' in error &&
+      (error.code === 'ENOENT' || error.code === 'ENOTEMPTY')
+    )
+      return;
+    throw error;
+  }
+  await removeEmptyParents(root, dirname(directory));
 }

@@ -81,8 +81,8 @@ export async function reconcileMirror(
   await ensureDirectory(root);
   await verifyMirror(root);
   const failures = [
-    ...(await updateCopies(root, prepared)),
     ...(await removeCopies(root, workspace)),
+    ...(await updateCopies(root, prepared)),
   ];
   const safeToUpdate = await retainedCopies(root, workspace, previous);
   await verifyMirror(root);
