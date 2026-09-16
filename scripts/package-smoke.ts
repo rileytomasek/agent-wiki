@@ -90,6 +90,31 @@ async function verify(directory: string) {
     run(cli, ['--version'], { cwd: directory, env }),
     /^0\.0\.0\n$/u
   );
+  assert.match(
+    run(cli, ['--root', join(directory, 'wiki'), 'show', 'notes.md'], {
+      cwd: directory,
+      env,
+    }),
+    /Readable content/u
+  );
+  const listing: unknown = JSON.parse(
+    run(
+      cli,
+      [
+        'list',
+        '--root',
+        join(directory, 'wiki'),
+        '--type',
+        'doc/guide',
+        '--json',
+      ],
+      { cwd: directory, env }
+    )
+  );
+  assert.ok(
+    typeof listing === 'object' && listing !== null && 'total' in listing
+  );
+  assert.equal(listing.total, 1);
   await assert.rejects(lstat(join(directory, 'node_modules/husky')), {
     code: 'ENOENT',
   });

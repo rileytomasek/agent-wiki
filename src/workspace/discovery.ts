@@ -2,6 +2,7 @@ import type { Dirent } from 'node:fs';
 import { posix, resolve } from 'node:path';
 
 import type { Diagnostic } from '../documents/types.ts';
+import { isDiscoveredPath } from './discovery-policy.ts';
 import {
   filesystemIO,
   isMissing,
@@ -15,7 +16,6 @@ import {
 } from './source-path.ts';
 
 export const DISCOVERY_VERSION = '1';
-const excluded = new Set(['node_modules', 'vendor', 'dist', 'build']);
 
 export interface Inventory {
   readonly files: readonly string[];
@@ -45,7 +45,7 @@ async function acceptSymlink(scan: Scan, path: string): Promise<void> {
 }
 
 async function visitEntry(scan: Scan, parent: string, entry: Dirent) {
-  if (entry.name.startsWith('.') || excluded.has(entry.name)) return;
+  if (!isDiscoveredPath(entry.name)) return;
   const path = posix.join(parent, entry.name);
   if (entry.isDirectory()) await visitDirectory(scan, path);
   else if (entry.isSymbolicLink()) await acceptSymlink(scan, path);

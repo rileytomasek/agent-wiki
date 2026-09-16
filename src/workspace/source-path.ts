@@ -1,6 +1,8 @@
 import { lstat, realpath, stat } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
+import { isDiscoveredPath } from './discovery-policy.ts';
+
 function withinRoot(root: string, path: string): boolean {
   const local = relative(root, path);
   return local !== '..' && !local.startsWith(`..${sep}`) && !isAbsolute(local);
@@ -14,6 +16,9 @@ function sourcePath(root: string, path: string): string {
   if (!withinRoot(resolve(root), resolved) || resolved === resolve(root)) {
     throw new Error(`Path escapes the wiki root: ${path}`);
   }
+  const canonical = relative(resolve(root), resolved).split(sep).join('/');
+  if (!isDiscoveredPath(canonical))
+    throw new Error(`Document path is excluded from the wiki: ${path}`);
   return resolved;
 }
 

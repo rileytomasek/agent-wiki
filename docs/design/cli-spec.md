@@ -21,7 +21,7 @@ See the [architecture](architecture.md) for component boundaries, data models, a
 
 - Global flags work before or after the command: `--root <directory>` overrides root discovery; `--json` returns structured results and diagnostics; `--help` shows general or command help; `--version` prints the CLI version and exits.
 - `search` and `list` share `--type <value>` (exact type), `--category <value>` (category segment), `--name <value>` (name segment), `--about <path>` (principal subject), and `--stale`, combined with AND. `list` also supports `--path <glob>` and applies exact filters before limiting. Search uses QMD's native filters and ranking; returned results satisfy filters, but selective queries may underfill QMD's candidate window.
-- `search`, `list`, and `related` share `--limit <number>`, counting documents for search/list and relationships for related. Report known truncation; search totals may be unknown.
+- `search`, `list`, and `related` share `--limit <number>`, requiring a positive safe integer and counting documents for search/list and relationships for related. Lists and relationships are unlimited by default; search retains QMD's native default. Report known truncation; search totals may be unknown.
 
 ## Root discovery
 

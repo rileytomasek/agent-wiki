@@ -67,3 +67,21 @@ address the scalar token, including its quote or block style; editors must retai
 the style and comments when changing its value. `referencesComplete: false`
 means a full reference-preserving rewrite cannot be guaranteed. It does not make
 the source unreadable.
+
+## Inspection operations
+
+`showDocument(root, target, { clock? })` returns a `ShowResult` with `document`
+metadata/review status, `content`, optional `section`, ancestor `headingContext`,
+included `footnotes`, diagnostics, and `complete`. Whole-document content is the
+unchanged source. Section content joins original heading/body/footnote slices.
+`OperationError` carries a stable code and candidate paths for ambiguous aliases.
+
+`listDocuments(root, { filters?, limit?, clock? })` returns a `ListResult` with
+`documents`, `total`, `truncated`, diagnostics, and `complete`. Each document has
+its path, title, normalized metadata, and review status. Exact filters combine
+with AND before the positive integer limit; the default is unlimited. `total`
+counts matching readable documents; `complete: false` distinguishes partial
+filesystem coverage from an exhaustive list. Content diagnostics describe the
+returned documents, with operational problems reported separately in the same
+diagnostic array. Both operations capture their clock once before asynchronous
+reads and do not initialize search.
