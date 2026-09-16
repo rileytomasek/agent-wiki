@@ -14,6 +14,7 @@ const options = {
   stale: { type: 'boolean', default: false },
   limit: { type: 'string' },
   rebuild: { type: 'boolean', default: false },
+  'dry-run': { type: 'boolean', default: false },
 } satisfies ParseArgsOptionsConfig;
 
 /** Read output mode even when strict parsing will subsequently report an error. */
@@ -39,6 +40,7 @@ export interface Arguments {
   readonly stale: boolean;
   readonly limit: string | undefined;
   readonly rebuild: boolean;
+  readonly dryRun: boolean;
 }
 
 /** Node's parser accepts globals on either side of a command and honors --. */
@@ -54,6 +56,7 @@ export function parseArguments(args: readonly string[]): Arguments {
     command,
     operands,
     ...values,
+    dryRun: values['dry-run'],
     root: values.root,
     type: values.type,
     category: values.category,
