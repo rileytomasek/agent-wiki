@@ -3,8 +3,22 @@ import type {
   MetadataFilter,
   SearchHit,
   SearchStore,
+  ReferenceOccurrence,
+  RelatedResult,
+  ValidationResult,
   WikiFrontmatter,
 } from 'agent-wiki';
+
+export function referenceTypes(
+  result: RelatedResult,
+  validation: ValidationResult
+): readonly ReferenceOccurrence[] {
+  // @ts-expect-error -- Relationship results are immutable.
+  result.relationships = [];
+  // @ts-expect-error -- Validation selections cannot be mutated by consumers.
+  validation.selectedPaths[0] = 'other.md';
+  return result.relationships.map((relationship) => relationship.occurrence);
+}
 
 export function documentTypes(snapshot: DocumentSnapshot): WikiFrontmatter {
   // @ts-expect-error -- Normalized document identities are immutable to consumers.

@@ -85,3 +85,28 @@ filesystem coverage from an exhaustive list. Content diagnostics describe the
 returned documents, with operational problems reported separately in the same
 diagnostic array. Both operations capture their clock once before asynchronous
 reads and do not initialize search.
+
+## Relationships and validation
+
+`buildGraph(workspace)` is a pure operation over normalized snapshots and file
+inventory. It reconstructs target, alias, incoming, and outgoing maps, preserving
+unresolved reference occurrences. No graph state is persisted.
+
+`related(root, target, { limit? })` returns the target and immediate
+`relationships`, known `total`, `truncated`, diagnostics, and `complete`. Each
+relationship has a direction and an occurrence retaining the authored reference,
+source path/section, use location, and resolved or unresolved destination. A
+self-reference has direction `both` and consumes one relationship slot.
+
+`validate(root, selections?)` returns `selectedPaths`, diagnostics, `complete`,
+and `valid`. Selection accepts literal files, recursive directories, and globs;
+an unmatched selection throws `OperationError`. Whole-wiki context is always
+available to resolution, even when reporting diagnostics for selected files.
+`complete` describes operational coverage, while `valid` additionally requires
+no structural errors. Neither operation initializes QMD or fetches URLs.
+
+GitHub recognition is intentionally limited to `github.com`; other hosts use
+conservative generic URL identities. Recognized resources include the host and
+owner/repository namespace. Authored URLs and selectors stay on occurrences.
+Generic URL identities retain query parameters and fragments, including for
+non-HTTP schemes. Alias collisions are lookup ambiguity, not structural errors.
