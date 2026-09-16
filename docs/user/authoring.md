@@ -87,9 +87,9 @@ Use `stale_after: '2026-12-01'` when the document should be reviewed on or after
 that date. Omit it when there is no known deadline. A due document remains
 readable and searchable, and its deadline does not imply its content is wrong.
 
-The planned `wiki list --stale` command lists overdue documents. Editing or
+The `wiki list --stale` command lists overdue documents. Editing or
 reindexing will not reset the deadline; update or remove it after an actual review.
-Search-index currency is separate: the planned `wiki index` command refreshes
+Search-index currency is separate: the `wiki index` command refreshes
 search after content changes.
 
 For a connected example, read the [example wiki](../../examples/wiki/README.md).

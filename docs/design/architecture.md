@@ -1,6 +1,6 @@
 # Agent Wiki Architecture
 
-Architecture for the [Agent Wiki format](document-format.md) and [CLI functional spec](cli-spec.md). This documents the agreed direction and proposes concrete implementation defaults; it does not describe an implemented CLI. The format spec governs authored content, and the functional spec governs commands. Internal names and interfaces below are illustrative.
+Architecture for the [Agent Wiki format](document-format.md) and [CLI functional spec](cli-spec.md). The format spec governs authored content, and the functional spec governs commands. Internal names and interface sketches below are illustrative; the [library API](library-api.md) describes the implemented contracts.
 
 The [repository setup and code-quality decisions](../contributing/tooling.md) define the strict tooling, tests, development Git hooks, and CI required from the initial setup phase.
 
@@ -406,6 +406,10 @@ The exploratory benchmark used synthetic documents averaging about 1.9 KB, rough
 | Unchanged QMD content update     | 53 ms           | 516 ms           |
 
 These measurements exclude embedding generation, model startup/inference, complete validation, final CLI startup, and production corpus variability. They are design evidence, not latency guarantees. The benchmark graph and parser were prototypes, not the final implementation.
+
+The [verification guide](../contributing/verification.md#representative-benchmark)
+records measurements of the implemented library, including complete validation,
+status inspection, and separate real-model costs.
 
 The resulting priorities are straightforward: cache parsing, reconstruct the graph when needed, write only changed projections, keep QMD update off the search path, and load dependencies on demand. Use modest bounded file concurrency and measure again on a representative corpus before adding stat shortcuts, workers, persistent graph storage, or more indexing machinery.
 

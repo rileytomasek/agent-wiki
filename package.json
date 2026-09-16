@@ -34,7 +34,8 @@
     "test:tooling": "node scripts/tooling-smoke.ts",
     "test:qmd:models": "node scripts/qmd-model-smoke.ts",
     "precommit": "lint-staged --concurrent false && bun run knip",
-    "prepare": "node scripts/install-hooks.ts"
+    "prepare": "node scripts/install-hooks.ts",
+    "benchmark": "node scripts/benchmark.ts"
   },
   "dependencies": {
     "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
