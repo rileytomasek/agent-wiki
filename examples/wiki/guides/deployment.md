@@ -8,6 +8,7 @@ authors:
 published_at: '2026-09-10'
 stale_after: '2026-12-01'
 ---
+
 # Deployment Guide
 
 Deploy the [website][website] in small, reversible steps.[^rollout]
@@ -20,7 +21,8 @@ Deploy the [website][website] in small, reversible steps.[^rollout]
 
 ## Sources
 
-[^rollout]: [Example rollout](https://github.com/example/website/pull/42).
+[^rollout]:
+    [Example rollout](https://github.com/example/website/pull/42).
     The example describes one change, not every possible deployment.
 
 [website]: ../projects/website.md

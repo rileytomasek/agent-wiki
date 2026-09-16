@@ -1,0 +1,23 @@
+min_version = "2026.9.8"
+
+[tools]
+node = ["24.21.0", "22.22.1"]
+bun = "1.4.2"
+
+[tools."http:qmd"]
+version = "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+url = "https://github.com/tobi/qmd/archive/{{ version }}.tar.gz"
+checksum = "sha256:60a6b1f7063aeca9262355c3422f47db2269bdb85c00a6b2a29d7fbf94561201"
+strip_components = 1
+bin_path = "bin"
+depends = ["node", "bun"]
+postinstall = 'cd "$MISE_TOOL_INSTALL_PATH" && bun ci --linker isolated --minimum-release-age 172800'
+
+[tasks.check]
+run = "bun run check"
+
+[tasks.qmd]
+run = "qmd"
+
+[tasks."qmd:models"]
+run = "bun run test:qmd:models"

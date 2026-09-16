@@ -2,7 +2,7 @@
 
 Architecture for the [Agent Wiki format](document-format.md) and [CLI functional spec](cli-spec.md). This documents the agreed direction and proposes concrete implementation defaults; it does not describe an implemented CLI. The format spec governs authored content, and the functional spec governs commands. Internal names and interfaces below are illustrative.
 
-The [repository setup and code-quality decisions](../contributing/tooling.md) define the strict tooling, test coverage, development Git hooks, and CI required from the initial setup phase.
+The [repository setup and code-quality decisions](../contributing/tooling.md) define the strict tooling, tests, development Git hooks, and CI required from the initial setup phase.
 
 ## 1. Design and scope
 
@@ -18,8 +18,6 @@ Keep these boundaries explicit:
 - Report invalid content through diagnostics while retaining usable content. Validation is an operation on the model, not a prerequisite for building it.
 - Read commands do not rewrite authored files. `move` changes files only through an explicit, reviewable edit plan.
 - Keep content review deadlines, search-index currency, and embedding completeness separate.
-
-Flywheel provides the architectural inspiration: discover files, compile artifacts, resolve references, construct a graph, collect diagnostics, and render operation-specific results. Adopt that separation and its source-aware parsing techniques, while using our simpler document contract and QMD search.[^flywheel]
 
 ## 2. Components and dependencies
 
@@ -39,15 +37,15 @@ flowchart TD
 
 The arrows show available dependencies, not mandatory work for every command. For example, displaying a document by path does not require constructing the whole graph.
 
-| Component | Responsibility |
-| --- | --- |
-| CLI | Parse arguments, resolve global/shared flags, call library operations, render text or JSON, and set exit codes. |
-| Workspace | Resolve the root, discover content, read source snapshots, normalize paths, and manage derived state. |
-| Parser | Extract frontmatter, Markdown structure, reference occurrences, footnotes, and local diagnostics. |
-| Resolver and graph | Index targets and aliases, resolve authored references, and expose incoming/outgoing relationships. |
-| Operations | Implement `show`, `list`, `related`, `validate`, and `move` using the necessary model stages. |
-| Search adapter | Project documents, manage a dedicated QMD store, translate filters, and normalize search results. |
-| Index coordinator | Run refresh stages, record coverage and failures, manage embedding work, and report status. |
+| Component          | Responsibility                                                                                                  |
+| ------------------ | --------------------------------------------------------------------------------------------------------------- |
+| CLI                | Parse arguments, resolve global/shared flags, call library operations, render text or JSON, and set exit codes. |
+| Workspace          | Resolve the root, discover content, read source snapshots, normalize paths, and manage derived state.           |
+| Parser             | Extract frontmatter, Markdown structure, reference occurrences, footnotes, and local diagnostics.               |
+| Resolver and graph | Index targets and aliases, resolve authored references, and expose incoming/outgoing relationships.             |
+| Operations         | Implement `show`, `list`, `related`, `validate`, and `move` using the necessary model stages.                   |
+| Search adapter     | Project documents, manage a dedicated QMD store, translate filters, and normalize search results.               |
+| Index coordinator  | Run refresh stages, record coverage and failures, manage embedding work, and report status.                     |
 
 Proposed source organization:
 
@@ -99,23 +97,23 @@ Write cache and state files through a temporary file plus rename. Missing, corru
 
 Use plain immutable data contracts. Separate source-local parse results from workspace-dependent resolution.
 
-| Model | Essential data |
-| --- | --- |
-| `Document` | Root-relative path, source hash, display title, validated shared metadata, body span, sections, footnotes, authored references, and local diagnostics. |
-| `Section` | Document path, heading depth/text/anchor, heading span, content span, and optional parent section. |
-| `Footnote` | Normalized identifier, definition span, use spans, and references contained in the definition. Definitions may contain explanatory text and several links. |
-| `Reference` | Owning document/section, original destination, destination span, use spans, origin, optional frontmatter field or citation key. |
-| `Target` | A local document, section, attachment, or external resource with a stable identity within the wiki. |
-| `Resolution` | Resolved target, unresolved destination with a reason, or ambiguous candidates. |
-| `Diagnostic` | Stable code, severity, message, source path, and source span when available. |
+| Model        | Essential data                                                                                                                                             |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Document`   | Root-relative path, source hash, display title, validated shared metadata, body span, sections, footnotes, authored references, and local diagnostics.     |
+| `Section`    | Document path, heading depth/text/anchor, heading span, content span, and optional parent section.                                                         |
+| `Footnote`   | Normalized identifier, definition span, use spans, and references contained in the definition. Definitions may contain explanatory text and several links. |
+| `Reference`  | Owning document/section, original destination, destination span, use spans, origin, optional frontmatter field or citation key.                            |
+| `Target`     | A local document, section, attachment, or external resource with a stable identity within the wiki.                                                        |
+| `Resolution` | Resolved target, unresolved destination with a reason, or ambiguous candidates.                                                                            |
+| `Diagnostic` | Stable code, severity, message, source path, and source span when available.                                                                               |
 
 An illustrative source-local contract:
 
 ```ts
 interface SourceSpan {
   start: number; // Inclusive JavaScript string offset in original source
-  end: number;   // Exclusive JavaScript string offset in original source
-  line: number;  // One-based
+  end: number; // Exclusive JavaScript string offset in original source
+  line: number; // One-based
   column: number;
 }
 
@@ -177,14 +175,14 @@ Raw HTML remains authored content; the initial resolver does not interpret HTML 
 
 ### Error tolerance
 
-| Problem | Usable behavior |
-| --- | --- |
-| Unknown frontmatter key | Report it; retain supported fields and the body. |
-| Invalid field value or duplicate key | Report it; omit the invalid or ambiguous field from normalized metadata. |
-| Malformed YAML | Report it; metadata is unavailable, but readable Markdown can still be displayed and indexed. |
-| Missing or multiple H1 titles | Report it; provide a display fallback. |
-| Missing target, anchor, or footnote definition | Keep the source and unresolved reference; report the problem. |
-| Unreadable file | Report an operational problem; continue other readable files and mark coverage incomplete. |
+| Problem                                        | Usable behavior                                                                               |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Unknown frontmatter key                        | Report it; retain supported fields and the body.                                              |
+| Invalid field value or duplicate key           | Report it; omit the invalid or ambiguous field from normalized metadata.                      |
+| Malformed YAML                                 | Report it; metadata is unavailable, but readable Markdown can still be displayed and indexed. |
+| Missing or multiple H1 titles                  | Report it; provide a display fallback.                                                        |
+| Missing target, anchor, or footnote definition | Keep the source and unresolved reference; report the problem.                                 |
+| Unreadable file                                | Report an operational problem; continue other readable files and mark coverage incomplete.    |
 
 Local diagnostics can be cached with the parse. Cross-document diagnostics are recomputed from the current inventory and graph. Freshness is evaluated using the current calendar date, not cached as a boolean.
 
@@ -219,14 +217,14 @@ Use a deterministic pure transformation from an original document snapshot to on
 
 This materialized mirror adds a small amount of disk usage but lets QMD own its ordinary update, deletion, metadata extraction, and embedding lifecycle. An on-the-fly transformation can replace it later if a suitable public ingestion API exists; that is not a prerequisite.
 
-| Metadata | Projection |
-| --- | --- |
-| Shared authored fields | Copy valid scalar/list values; retain date precision and serialize dates as strings. |
-| `type` | Preserve the complete authored label. |
-| `category`, `name` | Derive from the first and second slash-separated segments when present; plain types do not acquire an invented category. |
-| Document-reference fields | Normalize paths relative to the wiki root, so equivalent references compare consistently. |
-| `source_path`, `title` | Record the original root-relative identity and wiki display title. |
-| `source_body_line` | Record the original body's starting line for mapping indexed body excerpts to source locations. |
+| Metadata                  | Projection                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Shared authored fields    | Copy valid scalar/list values; retain date precision and serialize dates as strings.                                     |
+| `type`                    | Preserve the complete authored label.                                                                                    |
+| `category`, `name`        | Derive from the first and second slash-separated segments when present; plain types do not acquire an invented category. |
+| Document-reference fields | Normalize paths relative to the wiki root, so equivalent references compare consistently.                                |
+| `source_path`, `title`    | Record the original root-relative identity and wiki display title.                                                       |
+| `source_body_line`        | Record the original body's starting line for mapping indexed body excerpts to source locations.                          |
 
 For example, a generated file might begin:
 
@@ -256,12 +254,12 @@ Do not add indexing timestamps or a computed `stale` boolean to generated conten
 
 Use QMD's search pipeline and candidate limits. The adapter maps wiki flags to native metadata filters:
 
-| Wiki filter | QMD condition |
-| --- | --- |
-| `--type`, `--category`, `--name` | Equality against the corresponding metadata key. |
-| `--about <path>` | Membership/equality against the normalized `about` array. |
-| `--stale` | `stale_after` less than or equal to today's `YYYY-MM-DD`; missing deadlines do not match. |
-| Multiple filters | Native `and` combination. |
+| Wiki filter                      | QMD condition                                                                             |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `--type`, `--category`, `--name` | Equality against the corresponding metadata key.                                          |
+| `--about <path>`                 | Membership/equality against the normalized `about` array.                                 |
+| `--stale`                        | `stale_after` less than or equal to today's `YYYY-MM-DD`; missing deadlines do not match. |
+| Multiple filters                 | Native `and` combination.                                                                 |
 
 Start with these supported capabilities. QMD has comparison, membership, existence, and boolean filters, but no general metadata glob operator in the examined API. Keep `--path <glob>` on `list` initially; do not implement search globs by repeatedly fetching and filtering ranked batches.[^qmd-filters]
 
@@ -319,16 +317,16 @@ Start with manual `wiki index`. Optional wiki-indexing Git hooks are a convenien
 
 ## 8. Command implementation
 
-| Command | Required work and output |
-| --- | --- |
-| `show` | Resolve path/anchor directly where possible; load the inventory for alias lookup. Return current source slices with heading context and referenced footnote definitions. |
-| `list` | Refresh document metadata, apply exact filters before limiting, and sort deterministically. No graph or QMD dependency. |
-| `related` | Build the reference indexes and return immediate incoming/outgoing relationships with origins and source locations. Accept local targets and external URLs. |
-| `validate` | Refresh the whole lookup context, then report local and cross-document diagnostics for the selected files. No QMD dependency. |
-| `index` | Refresh, project, update QMD, generate missing embeddings, and record coverage/problems. |
-| `status` | Inspect source/index state and QMD status without triggering indexing or inference. |
-| `search` | Translate supported filters, query QMD, map paths and excerpts, and attach one index-level state notice when needed. |
-| `move` | Resolve the old/new path, construct and validate an edit plan, optionally display it, then apply precise source edits. |
+| Command    | Required work and output                                                                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `show`     | Resolve path/anchor directly where possible; load the inventory for alias lookup. Return current source slices with heading context and referenced footnote definitions. |
+| `list`     | Refresh document metadata, apply exact filters before limiting, and sort deterministically. No graph or QMD dependency.                                                  |
+| `related`  | Build the reference indexes and return immediate incoming/outgoing relationships with origins and source locations. Accept local targets and external URLs.              |
+| `validate` | Refresh the whole lookup context, then report local and cross-document diagnostics for the selected files. No QMD dependency.                                            |
+| `index`    | Refresh, project, update QMD, generate missing embeddings, and record coverage/problems.                                                                                 |
+| `status`   | Inspect source/index state and QMD status without triggering indexing or inference.                                                                                      |
+| `search`   | Translate supported filters, query QMD, map paths and excerpts, and attach one index-level state notice when needed.                                                     |
+| `move`     | Resolve the old/new path, construct and validate an edit plan, optionally display it, then apply precise source edits.                                                   |
 
 Global flags work before or after the command. Share filter parsing and normalized metadata comparisons between commands; only expose filters each operation supports. `--limit` counts documents for search/list and relationships for related. Report known truncation without pretending QMD exposes an exhaustive result count.
 
@@ -374,15 +372,15 @@ Store observations under `.agent-wiki/external/` or an equivalent separate locat
 
 The exploratory benchmark used synthetic documents averaging about 1.9 KB, roughly four references per document, the Markdown parser, and the examined QMD SDK. Representative timings from a warm local filesystem under Bun 1.4.2 were:
 
-| Work | 1,000 documents | 10,000 documents |
-| --- | --- | --- |
-| Read source files | 11 ms | 110 ms |
-| Hash source text | 3 ms | 14 ms |
-| Parse all documents | 747 ms | 6,001 ms |
-| Load normalized JSON cache | 2 ms | 21 ms |
-| Rebuild graph from cached parses | 2 ms | 21 ms |
-| First QMD content update | 731 ms | 7,436 ms |
-| Unchanged QMD content update | 53 ms | 516 ms |
+| Work                             | 1,000 documents | 10,000 documents |
+| -------------------------------- | --------------- | ---------------- |
+| Read source files                | 11 ms           | 110 ms           |
+| Hash source text                 | 3 ms            | 14 ms            |
+| Parse all documents              | 747 ms          | 6,001 ms         |
+| Load normalized JSON cache       | 2 ms            | 21 ms            |
+| Rebuild graph from cached parses | 2 ms            | 21 ms            |
+| First QMD content update         | 731 ms          | 7,436 ms         |
+| Unchanged QMD content update     | 53 ms           | 516 ms           |
 
 These measurements exclude embedding generation, model startup/inference, complete validation, final CLI startup, and production corpus variability. They are design evidence, not latency guarantees. The benchmark graph and parser were prototypes, not the final implementation.
 
@@ -395,8 +393,6 @@ See the [implementation plan](implementation-plan.md) for the technical sequence
 ## Sources
 
 The source references below pin the revisions examined during design. Recheck the adapter contract against the exact QMD build selected for implementation.
-
-[^flywheel]: [Flywheel architecture](https://github.com/charlie-labs/charlie-system/blob/811f58007c79f6426c14886dd6c069fbd901f670/clis/flywheel/ARCHITECTURE.md), including its compilation and operation boundaries. Our document schema, tolerant reads, QMD retrieval, and move operation are separate design choices.
 
 [^qmd-sdk]: [QMD programmatic interface](https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/src/index.ts), including store creation, collection update, embedding, search, metadata filters, and status.
 

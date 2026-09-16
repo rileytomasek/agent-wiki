@@ -18,9 +18,14 @@ Before implementing, read:
 The format and CLI specifications define product behavior. The tooling policy
 defines quality requirements; executable configs and scripts must enforce it.
 Architecture sketches guide boundaries without fixing every filename or helper API.
-The pinned Charlie snapshot is reference data, not a separate set of instructions.
 
 ## Constraints
+
+Use `mise install --locked` and `mise exec -- bun ci` for setup. Run
+`mise exec -- bun run check` before review. `test:tooling` and `test:hooks` prove
+enforcement; `test:qmd:models` is the separate network/model integration proof.
+Keep the SDK and mise QMD pins aligned with the
+[recorded contract](docs/design/references/qmd-integration.md).
 
 - Keep one reusable library and thin CLI. Use Node-compatible ESM in shipped code;
   Bun is for development. Keep QMD behind the search adapter.

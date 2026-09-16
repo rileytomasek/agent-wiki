@@ -16,22 +16,22 @@ See the [CLI functional spec](cli-spec.md), [architecture](architecture.md), and
 
 YAML frontmatter is optional. All supported fields are optional and available on every document, regardless of `type`. Each field has one meaning and value format across all types.
 
-| Field | Format | Meaning |
-| --- | --- | --- |
-| `type` | Nonempty string; conventionally `category/name` | Descriptive classification, such as `entity/person`, `event/meeting`, or `doc/guide`; no registration required. |
-| `aliases` | List of nonempty strings | Alternative names for document lookup; links still target paths. |
-| `about` | List of relative paths to Markdown documents | Principal subjects, resolved relative to the containing document. |
-| `stale_after` | Valid ISO calendar date, `YYYY-MM-DD` | Date on which review becomes due and freshness becomes unverified. |
-| `url` | Absolute HTTP(S) URL | Primary external page for the document or thing it describes; supporting sources remain citations. |
-| `email` | Email address string | Primary contact email. |
-| `phone` | Nonempty string | Primary contact number; international format is recommended, but extensions and local formatting are allowed. |
-| `address` | Nonempty string; multiline allowed | Physical or postal address. |
-| `starts_at` | Calendar date or timestamp with timezone | Start of the described event or period. |
-| `ends_at` | Calendar date or timestamp with timezone | End of the described event or period. |
-| `published_at` | Calendar date or timestamp with timezone | Publication date of the described work or document. |
-| `authors` | List of relative paths to Markdown documents | People or organizations credited with authorship. |
-| `participants` | List of relative paths to Markdown documents | People or organizations participating in the described event or activity. |
-| `location` | Relative path to a Markdown document | Place where the described thing is located or occurs. |
+| Field          | Format                                          | Meaning                                                                                                         |
+| -------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `type`         | Nonempty string; conventionally `category/name` | Descriptive classification, such as `entity/person`, `event/meeting`, or `doc/guide`; no registration required. |
+| `aliases`      | List of nonempty strings                        | Alternative names for document lookup; links still target paths.                                                |
+| `about`        | List of relative paths to Markdown documents    | Principal subjects, resolved relative to the containing document.                                               |
+| `stale_after`  | Valid ISO calendar date, `YYYY-MM-DD`           | Date on which review becomes due and freshness becomes unverified.                                              |
+| `url`          | Absolute HTTP(S) URL                            | Primary external page for the document or thing it describes; supporting sources remain citations.              |
+| `email`        | Email address string                            | Primary contact email.                                                                                          |
+| `phone`        | Nonempty string                                 | Primary contact number; international format is recommended, but extensions and local formatting are allowed.   |
+| `address`      | Nonempty string; multiline allowed              | Physical or postal address.                                                                                     |
+| `starts_at`    | Calendar date or timestamp with timezone        | Start of the described event or period.                                                                         |
+| `ends_at`      | Calendar date or timestamp with timezone        | End of the described event or period.                                                                           |
+| `published_at` | Calendar date or timestamp with timezone        | Publication date of the described work or document.                                                             |
+| `authors`      | List of relative paths to Markdown documents    | People or organizations credited with authorship.                                                               |
+| `participants` | List of relative paths to Markdown documents    | People or organizations participating in the described event or activity.                                       |
+| `location`     | Relative path to a Markdown document            | Place where the described thing is located or occurs.                                                           |
 
 - Document references in `about`, `authors`, `participants`, and `location` resolve relative to the containing document. Do not mix plain names and paths; unlinked names belong in the body.
 - Dates use valid `YYYY-MM-DD` calendar dates or, where permitted, ISO timestamps with an explicit UTC offset or `Z`, such as `2026-09-15T14:00:00-04:00`. Preserve known precision; do not invent a time for a date-only value.

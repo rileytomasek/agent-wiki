@@ -1,0 +1,67 @@
+{
+  "name": "agent-wiki",
+  "version": "0.0.0",
+  "description": "A local Markdown wiki library and CLI",
+  "bin": {
+    "wiki": "./dist/cli/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node node_modules/typescript/bin/tsc -p tsconfig.build.json",
+    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run knip && bun run knip:production && bun run test && bun run build && bun run test:package",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint --deny-warnings --report-unused-disable-directives",
+    "lint:fix": "oxlint --fix --deny-warnings --report-unused-disable-directives",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "knip": "knip",
+    "knip:production": "knip --production",
+    "test": "node node_modules/vitest/vitest.mjs run",
+    "test:package": "node scripts/package-smoke.ts",
+    "test:hooks": "node scripts/hook-smoke.ts",
+    "test:tooling": "node scripts/tooling-smoke.ts",
+    "test:qmd:models": "node scripts/qmd-model-smoke.ts",
+    "precommit": "lint-staged --concurrent false && bun run knip",
+    "prepare": "node scripts/install-hooks.ts"
+  },
+  "dependencies": {
+    "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "22.20.2",
+    "fast-check": "4.10.0",
+    "husky": "9.1.7",
+    "knip": "6.29.0",
+    "lint-staged": "17.5.1",
+    "oxfmt": "0.61.0",
+    "oxlint": "1.76.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "typescript": "7.0.2",
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": "^22.22.1 || ^24.21.0"
+  },
+  "packageManager": "bun@1.4.2",
+  "patchedDependencies": {
+    "@tobilu/qmd@github:tobi/qmd#04e4dbd": "patches/@tobilu%2Fqmd@github%3Atobi%2Fqmd#04e4dbd.patch"
+  },
+  "trustedDependencies": [
+    "@tobilu/qmd",
+    "node-llama-cpp"
+  ]
+}

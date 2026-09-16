@@ -26,6 +26,7 @@ aliases:
   - Alex
 email: alex@example.com
 ---
+
 # Alex Rivera
 
 Alex maintains the [website](../projects/website.md).
@@ -70,7 +71,8 @@ This workflow follows the published deployment notes.[^deployment]
 
 ## Sources
 
-[^deployment]: [Deployment notes](https://example.com/deployment).
+[^deployment]:
+    [Deployment notes](https://example.com/deployment).
     This source describes the original process; local settings may differ.
 ```
 
