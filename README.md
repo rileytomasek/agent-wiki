@@ -40,6 +40,14 @@ coverage without loading QMD or models. `searchWiki(root, query)` searches that
 snapshot with QMD's native hybrid ranking, filters, scores, and snippets.
 See the [QMD integration contract](docs/design/references/qmd-integration.md).
 
+Library callers can index a subset with
+`indexWiki(root, { selections: ['records/**/*.md'] })` while retaining the full
+repository as the reference boundary. Later indexing and currency checks reuse
+the saved scope. Long-running services can pass a caller-owned store from
+`openSearchStore(indexPaths(root))` to `searchWiki(root, query, { store })`;
+close it at shutdown and reopen it after a rebuild. See the
+[selection and store contracts](docs/design/library-api.md#explicit-indexing-and-status).
+
 ```sh
 mise exec -- bun run test          # Node/Vitest; no model downloads
 mise exec -- bun run test:tooling  # Demonstrate checks rejecting violations

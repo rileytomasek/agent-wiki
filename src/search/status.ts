@@ -29,6 +29,7 @@ function summary(
 
 function recordedFields(state: IndexState | null) {
   return {
+    selections: state?.selections ?? null,
     coverage: state?.coverage ?? null,
     pendingEmbeddings: state?.qmd?.needsEmbedding ?? null,
     lastTextUpdate: state?.textUpdatedAt ?? null,
@@ -68,7 +69,8 @@ export async function indexStatus(
   const currency = await indexCurrency(
     absolute,
     state?.baseline ?? null,
-    options.io
+    options.io,
+    state?.selections ?? []
   );
   return {
     root: absolute,

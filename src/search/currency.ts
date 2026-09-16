@@ -15,6 +15,7 @@ import type {
   SourceFingerprint,
   TextBaseline,
 } from './index-types.ts';
+import { selectInventory } from './selection.ts';
 
 interface SourceInventory {
   readonly sources: readonly SourceFingerprint[];
@@ -31,9 +32,13 @@ export interface CurrencyResult {
 
 async function sourceInventory(
   root: string,
-  io: WorkspaceIO
+  io: WorkspaceIO,
+  selections: readonly string[]
 ): Promise<SourceInventory> {
-  const inventory = await discoverWorkspace(root, io);
+  const inventory = selectInventory(
+    await discoverWorkspace(root, io),
+    selections
+  );
   const diagnostics = [...inventory.problems];
   const sources = await readFiles(inventory.documentPaths, async (path) => {
     try {
@@ -87,11 +92,13 @@ function changesFrom(
 export async function indexCurrency(
   root: string,
   baseline: TextBaseline | null,
-  io: WorkspaceIO = filesystemIO
+  io: WorkspaceIO = filesystemIO,
+  selections: readonly string[] = baseline?.selections ?? []
 ): Promise<CurrencyResult> {
-  const inventory = await sourceInventory(root, io);
+  const inventory = await sourceInventory(root, io, selections);
   if (
     baseline === null ||
+    JSON.stringify(baseline.selections) !== JSON.stringify(selections) ||
     !compatible(baseline.versions) ||
     !inventory.complete
   ) {

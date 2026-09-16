@@ -10,6 +10,8 @@ export interface WikiSearchOptions {
   readonly filters?: SearchFilters;
   readonly limit?: number;
   readonly clock?: Clock;
+  /** Store opened for this root with indexPaths(root); the caller owns its lifetime. */
+  readonly store?: SearchStore;
   /** Test/integration seam; normal searches use QMD's native hybrid pipeline. */
   readonly search?: (
     store: SearchStore,

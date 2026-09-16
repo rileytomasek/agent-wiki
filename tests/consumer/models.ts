@@ -2,7 +2,13 @@ import { strict as assert } from 'node:assert';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { indexWiki, indexStatus, searchWiki } from '@rileytomasek/agent-wiki';
+import {
+  indexWiki,
+  indexStatus,
+  searchWiki,
+  indexPaths,
+  openSearchStore,
+} from '@rileytomasek/agent-wiki';
 
 const root = resolve('model-wiki');
 await mkdir(root);
@@ -23,28 +29,49 @@ await Promise.all(
     )
   )
 );
-const indexed = await indexWiki(root);
+await writeFile(
+  resolve(root, 'excluded.md'),
+  '# Excluded\n\nFlowering plants and winter gardening.\n'
+);
+const indexed = await indexWiki(root, { selections: Object.keys(documents) });
 assert.equal(indexed.complete, true, JSON.stringify(indexed.diagnostics));
 assert.equal(indexed.embedding?.errors, 0);
 assert.equal(indexed.embedding.docsProcessed, 3);
 assert.equal((await indexWiki(root)).embedding?.docsProcessed, 0);
 assert.equal((await indexStatus(root)).pendingEmbeddings, 0);
-const result = await searchWiki(
-  root,
-  'protect flowering plants during freezing weather',
-  {
-    filters: { type: 'doc/guide' },
-    limit: 2,
-  }
-);
-assert.equal(result.complete, true);
-assert.equal(result.documents[0]?.path, gardenPath);
-assert.equal(result.documents[0].snippet.source, 'index');
-assert.equal(result.indexNotice, null);
-assert.ok(result.documents.length <= 2);
-assert.ok(
-  result.documents.every(
-    (document) => document.metadata['type'] === 'doc/guide'
-  )
-);
+const store = await openSearchStore(indexPaths(root));
+try {
+  const result = await searchWiki(
+    root,
+    'protect flowering plants during freezing weather',
+    {
+      store,
+      filters: { type: 'doc/guide' },
+      limit: 2,
+    }
+  );
+  assert.equal(result.complete, true);
+  assert.equal(result.documents[0]?.path, gardenPath);
+  assert.equal(result.documents[0].snippet.source, 'index');
+  assert.equal(result.indexNotice, null);
+  assert.ok(result.documents.length <= 2);
+  assert.ok(
+    result.documents.every(
+      (document) => document.metadata['type'] === 'doc/guide'
+    )
+  );
+  const repeated = await searchWiki(
+    root,
+    'protect flowering plants during freezing weather',
+    {
+      store,
+      filters: { type: 'doc/guide' },
+      limit: 2,
+    }
+  );
+  assert.equal(repeated.documents[0]?.path, gardenPath);
+  assert.equal(repeated.indexNotice, null);
+} finally {
+  await store.close();
+}
 console.log('Packaged embedding and native hybrid search passed');

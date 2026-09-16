@@ -1,4 +1,6 @@
 export { openSearchStore } from './search/qmd.ts';
+export { indexPaths } from './search/index-paths.ts';
+export type { IndexPaths } from './search/index-paths.ts';
 export { searchWiki } from './search/search.ts';
 export type {
   SearchDocument,

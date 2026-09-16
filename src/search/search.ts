@@ -68,16 +68,16 @@ function requireIndex(status: IndexStatusResult): void {
 async function queryIndex(
   root: string,
   query: string,
-  options: SearchOptions,
-  search: WikiSearchOptions['search']
+  native: SearchOptions,
+  options: WikiSearchOptions
 ): Promise<readonly SearchHit[]> {
-  const store = await openSearchStore(indexPaths(root));
+  const store = options.store ?? (await openSearchStore(indexPaths(root)));
   try {
-    return search === undefined
-      ? await store.search(query, options)
-      : await search(store, query, options);
+    return options.search === undefined
+      ? await store.search(query, native)
+      : await options.search(store, query, native);
   } finally {
-    await store.close();
+    if (options.store === undefined) await store.close();
   }
 }
 
@@ -97,7 +97,7 @@ export async function searchWiki(
   const status = await indexStatus(root);
   requireIndex(status);
   try {
-    const hits = await queryIndex(root, query, native, options.search);
+    const hits = await queryIndex(root, query, native, options);
     return {
       documents: hits.map((hit) => searchDocument(hit, today)),
       total: null,

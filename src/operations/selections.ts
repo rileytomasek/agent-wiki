@@ -7,14 +7,15 @@ import { OperationError } from './errors.ts';
 export function selectedDocuments(
   paths: readonly string[],
   selections: readonly string[],
-  complete: boolean
+  complete: boolean,
+  allowEmpty = false
 ): readonly string[] {
   if (selections.length === 0) return paths.toSorted();
   const selected = new Set<string>();
   for (const selection of selections) {
     const normalized = normalizedSelection(selection);
     const matches = matchingPaths(paths, normalized);
-    if (matches.length === 0 && normalized !== '.') {
+    if (!allowEmpty && matches.length === 0 && normalized !== '.') {
       const code = complete ? 'selection-unmatched' : 'selection-unavailable';
       throw new OperationError(
         code,
@@ -24,6 +25,16 @@ export function selectedDocuments(
     for (const path of matches) selected.add(path);
   }
   return [...selected].toSorted();
+}
+
+/** A stable selection representation; an empty set means the entire root. */
+export function normalizeSelections(
+  selections: readonly string[]
+): readonly string[] {
+  const normalized = [
+    ...new Set(selections.map((value) => normalizedSelection(value))),
+  ];
+  return normalized.includes('.') ? [] : normalized.toSorted();
 }
 
 function normalizedSelection(selection: string): string {

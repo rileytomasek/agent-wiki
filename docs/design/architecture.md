@@ -287,6 +287,16 @@ Search displays an indexed snapshot. `show` reads the current file. Avoid mainta
 
 ### `index`
 
+Library callers may select root-relative files, directories, or globs for indexing
+without narrowing the root used by parsing and reference resolution. Persist the
+normalized requested selection separately from the last successful text baseline's
+selection. Omitted selections reuse that saved request; an explicit empty set
+restores whole-root indexing. Empty matches support deleting the final selected
+document. Scope changes require complete selected-source coverage before mirror
+reconciliation, and incomplete changes cannot establish current currency. Currency
+inspection reads only selected sources. Existing version-one state means the whole
+root; missing or invalid scoped state requires explicit selection for recovery.
+
 1. Resolve the root and acquire a simple workspace write lock.
 2. Mark the index operation in progress, then refresh source snapshots and parses.
 3. Generate changed mirror files and remove only confirmed deletions. Preserve the last indexed copy for temporarily unreadable sources and report the gap.
@@ -325,6 +335,13 @@ Represent the same condition once in JSON. Do not add per-result stale-index or 
 `status` reports the resolved root, whether the index exists, coverage, last successful updates, source changes or unknown currency, pending embeddings, and known problems. It must not initialize a missing index or load inference models merely to report status.
 
 Source-content currency and embedding coverage can differ: a successful text update with failed embeddings is partially useful and needs a later retry. Preserve that distinction in status and failures; do not mark the whole indexing operation successful while requested embedding work remains.
+
+High-level search can borrow a caller-owned `SearchStore` opened from the public
+`indexPaths(root)` helper. It preserves native hybrid defaults and the lexical
+callback seam, and never closes a borrowed store. This lets long-running services
+reuse QMD's own model context without adding a pool or exposing QMD itself. Ordinary
+index updates are visible through the open SQLite connection; replacing the index
+with a rebuild requires the service to close and reopen its store.
 
 ### Content review deadlines
 

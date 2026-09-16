@@ -92,13 +92,35 @@ reads and do not initialize search.
 
 ## Explicit indexing and status
 
-`indexWiki(root, { rebuild?, clock?, io?, embed? })` returns an `IndexResult`
+`indexWiki(root, { selections?, rebuild?, clock?, io?, embed? })` returns an `IndexResult`
 with `root`, `complete`, QMD `update`/`embedding` results, persisted `state`, and
 diagnostics. Production defaults call the public QMD update and embedding APIs.
 The optional `embed` callback is an integration seam for offline tests and
 callers that control embedding work; remaining QMD work still prevents a complete
 result. Invalid authored metadata remains diagnostic data, not a gate on indexing
 usable content. Projection warnings describe omitted search metadata separately.
+
+`selections` accepts root-relative Markdown files, recursive directories, or globs,
+using the same matching rules as validation. For example,
+`indexWiki(root, { selections: ['records/**/*.md'] })` indexes records while the
+repository root remains the boundary for reads and reference validation. Selection
+limits the search mirror and its source fingerprints; it does not change authored
+paths or the discovery rules used by other operations. An empty match is valid for
+indexing, including when the final selected document has been deleted.
+
+Selections are normalized, deduplicated, and saved. Omission reuses the saved
+selection, including from `wiki index` and `wiki index --rebuild`; an explicit `[]`
+or `['.']` selects the whole root. New indexes default to the whole root. Source
+currency hashes only selected documents, so unrelated edits do not make search
+stale. Failed reads or scans affecting selected paths remain incomplete.
+
+The requested selections and the successful text baseline's selections are
+recorded separately. Changing selection requires complete selected-source and
+projection coverage before reconciling the mirror. A failed scope change retains
+the prior index and cannot claim current currency; the next explicit index retries
+the saved request. Missing or corrupt selection state beside an existing index
+requires explicit `indexWiki` selections rather than silently widening its scope.
+Version-one state migrates as a whole-root selection; new state uses version two.
 
 State stores the last observed QMD counts with `countsAt`, `textUpdatedAt` for a
 successful QMD text reconciliation, and `lastCompletedAt` for a fully completed
@@ -108,7 +130,7 @@ can advance `textUpdatedAt` while retaining the older complete baseline. Run
 stages are checkpointed atomically so interrupted work remains visibly incomplete.
 
 `indexStatus(root, { io? })` returns availability, source `currency`, a summary
-`status`, recorded coverage/count timestamps, pending embeddings, source changes,
+`status`, saved `selections`, recorded coverage/count timestamps, pending embeddings, source changes,
 diagnostics, and two completion flags. `complete` describes the inspection's
 operational coverage; `indexComplete` describes the recorded indexing run. An
 absent index is a successful inspection. Invalid state or an unreadable source
@@ -131,12 +153,44 @@ lock takeover. Release verifies that ownership has not changed.
 
 ## Snapshot search
 
-`searchWiki(root, query, { filters?, limit?, clock?, search? })` uses QMD's
+`searchWiki(root, query, { filters?, limit?, clock?, store?, search? })` uses QMD's
 native hybrid search by default. Exact type/category/name/about and review
 deadline filters combine with AND. QMD owns candidate selection, ranking,
 chunking, and the default result limit. The optional `search` callback is an
 integration seam for deterministic offline tests using the same store's lexical
 search; it is not a second retrieval engine.
+
+Long-running callers can reuse an open store. `indexPaths(root)` returns the
+absolute paths for that root's dedicated store and derived files. Pass a store
+opened with those paths to `searchWiki` for the same root; the caller closes it
+at shutdown. Search never closes a supplied store, including on failure, and
+never calls its update or document-embedding methods. Without `store`, each call
+opens and closes its own store. Reuse keeps QMD's model context available between
+requests; QMD still controls its native idle-model disposal policy.
+
+```ts
+import {
+  indexPaths,
+  openSearchStore,
+  searchWiki,
+} from '@rileytomasek/agent-wiki';
+
+const store = await openSearchStore(indexPaths(root));
+try {
+  const semantic = await searchWiki(root, 'winter plant care', { store });
+  const keyword = await searchWiki(root, 'orchid', {
+    store,
+    search: (opened, query, options) => opened.searchLex(query, options),
+  });
+} finally {
+  await store.close();
+}
+```
+
+Open stores see ordinary explicit index updates. Stop and reopen long-running
+search stores around `indexWiki(root, { rebuild: true })` or `wiki index --rebuild`,
+which replace the SQLite file. Stores are caller-owned resources, not an automatic
+pool; use the matching root and coordinate shutdown/rebuild in the embedding app.
 
 Results contain `documents` with original indexed path, title, score, metadata,
 review status, and `{ text, source: 'index' }` snippets. The adapter calls QMD's
