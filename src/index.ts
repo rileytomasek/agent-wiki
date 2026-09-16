@@ -84,6 +84,17 @@ export type {
 } from './operations/types.ts';
 export { indexWiki } from './search/index.ts';
 export { indexStatus } from './search/status.ts';
+export { moveDocument, applyMove } from './operations/move.ts';
+export { buildMovePlan } from './moves/planning.ts';
+export { formatMoveDiff } from './moves/diff.ts';
+export type { MovePlan, MoveFileChange } from './moves/types.ts';
+export type {
+  MoveOptions,
+  MoveResult,
+  MoveFileOutcome,
+} from './moves/result-types.ts';
+export type { MoveIO } from './moves/io.ts';
+export type { SourceEdit } from './moves/edits.ts';
 export type {
   IndexOptions,
   IndexResult,

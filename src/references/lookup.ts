@@ -23,18 +23,18 @@ export function findGraphTarget(
 ): TargetLookup {
   const literal = literalTarget(graph, requested);
   if (literal !== undefined) return { status: 'resolved', target: literal };
+  const { base, anchor } = requestedParts(requested);
+  const local = literalTarget(graph, base);
+  if (local !== undefined) return withAnchor(graph, local, anchor);
+  const exact = graph.aliases.get(requested);
+  if (graph.complete && exact !== undefined) return aliasTarget(graph, exact);
   if (isExternalReference(requested)) {
     const external = externalIdentity(requested);
     return external === undefined
       ? { status: 'unresolved', reason: 'invalid' }
       : { status: 'resolved', target: external.target };
   }
-  const { base, anchor } = requestedParts(requested);
-  const local = literalTarget(graph, base);
-  if (local !== undefined) return withAnchor(graph, local, anchor);
   if (!graph.complete) return { status: 'unresolved', reason: 'incomplete' };
-  const exact = graph.aliases.get(requested);
-  if (exact !== undefined) return aliasTarget(graph, exact);
   const alias = aliasTarget(graph, graph.aliases.get(base) ?? []);
   return alias.status === 'resolved'
     ? withAnchor(graph, alias.target, anchor)

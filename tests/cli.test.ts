@@ -55,10 +55,10 @@ test('argument boundaries preserve literals and diagnose invalid options', async
   expect(JSON.parse(malformed.stdout)).toHaveProperty('diagnostics');
 });
 
-test('unavailable and unknown commands fail honestly with separated output', async () => {
-  const result = await runCli(['move', 'source.md', 'destination.md']);
+test('invalid and unknown commands fail honestly with separated output', async () => {
+  const result = await runCli(['move']);
   expect(result).toMatchObject({ stdout: '', exitCode: 1 });
-  expect(result.stderr).toContain('not implemented yet');
+  expect(result.stderr).toContain('move expects 2 arguments');
   expect((await runCli(['typo'])).stderr).toContain('Unknown command: typo');
   const structured = await runCli(['--json', 'typo']);
   expect(structured.stderr).toBe('');

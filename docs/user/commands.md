@@ -24,7 +24,9 @@ wiki show 'guides/deployment.md#deploy' --root examples/wiki
 ```
 
 Targets are exact root-relative paths or declared aliases. A literal filename
-wins when it exists; `#heading` selects a heading anchor otherwise. Filenames are
+wins when it exists, followed by a real document path with a `#heading` anchor.
+Otherwise, an exact declared alias wins before interpreting an alias with a
+heading suffix. Filenames are
 not URI-decoded. Ambiguous aliases report all candidate paths. Lookup does not
 guess files from their basenames.
 
@@ -81,9 +83,10 @@ command. `--rebuild` recreates only search-derived files, requires complete
 readable source coverage, and preserves separate external observations.
 
 Writers share an exclusive lock. After an interrupted process, inspect the PID
-and host in `.agent-wiki/cache/write.lock`. If that owner has stopped, remove
-that abandoned lock and rerun the command. Existing locks are never stolen by
-a timer or another process.
+and host in `.agent-wiki/cache/write.lock`. Confirm that the owner has stopped
+before removing that abandoned lock. For an interrupted move, first inspect and
+restore any retained originals described below. Existing locks are never stolen
+by a timer or another process.
 
 ## Search the indexed snapshot
 
@@ -140,6 +143,45 @@ resolve against the whole wiki, while document diagnostics are limited to the
 selected files. Structural errors or incomplete filesystem coverage exit
 nonzero. A shared alias is ambiguous when looked up; sharing an alias does not
 by itself invalidate either document.
+
+## Move a document
+
+```sh
+wiki move guides/deployment.md playbooks/deploy.md --root examples/wiki --dry-run
+wiki move guides/deployment.md playbooks/deploy.md --root examples/wiki
+wiki move 'Deployment Guide' playbooks/deploy.md --json
+```
+
+The source is a whole document path or an unambiguous declared alias. The
+destination is a visible root-relative `.md` path. Preview shows every path and
+the complete before/after content changes. JSON includes original and proposed
+source, exact edits, and hashes, so library callers can review and apply the same
+plan. Dry-run creates no authored files or destination directories.
+
+Moves update incoming links and named frontmatter fields, then rebase outgoing
+relative links from the document's new location. Attachments, sections,
+self-links, shared definitions, and citations keep their targets. Labels,
+fragment spelling, comments, scalar styles, and unrelated source stay intact.
+Search remains on its indexed snapshot until `wiki index` runs again.
+
+Collisions, root escapes, ambiguous sources, incomplete reads, and reference
+syntax that cannot be rewritten exactly are refused. Unrelated title and value
+errors remain diagnostics. YAML anchors/aliases in reference fields and new
+paths that cannot retain an existing scalar style require an author edit before
+moving. Authored file symlinks and symlinked parents are refused for mutations.
+A move also refuses discovered file symlinks pointing at any moved or rewritten
+source, since their relative references could change meaning. Symlinks to
+unaffected files do not prevent moving.
+
+A multi-file move can fail after some writes. The command attempts rollback and
+reports `rolled-back` or `partial`, exits nonzero, and lists current states for
+all affected paths. `original` and `planned` describe matching content;
+`changed`, `missing`, and `unreadable` expose other observed outcomes. Retained
+recovery files are listed explicitly. Backup names include the original filename,
+for example `.guide.md.wiki-move-<token>.backup` beside the original location.
+After an interrupted move, inspect those originals and `.stage` replacements
+before restoring files and clearing the abandoned writer lock. Never overwrite
+newer content during manual recovery.
 
 ## JSON and failures
 
