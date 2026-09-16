@@ -2,9 +2,31 @@ import { strict as assert } from 'node:assert';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { openSearchStore, version } from 'agent-wiki';
+import {
+  hashSource,
+  openSearchStore,
+  parseDocument,
+  readDocument,
+  refreshWorkspace,
+  resolveRoot,
+  version,
+} from 'agent-wiki';
 
 assert.equal(typeof version, 'string');
+const wikiRoot = resolve('wiki');
+await mkdir(wikiRoot);
+const source = '---\ntype: doc/guide\n---\n# Notes\n\nReadable content.\n';
+await writeFile(resolve(wikiRoot, 'notes.md'), source);
+assert.equal(await resolveRoot({ cwd: wikiRoot }), wikiRoot);
+const parsed = parseDocument({
+  path: 'notes.md',
+  source,
+  sourceHash: hashSource(source),
+});
+assert.equal(parsed.title, 'Notes');
+assert.deepEqual(parsed.diagnostics, []);
+assert.equal((await readDocument(wikiRoot, 'notes.md')).source, source);
+assert.equal((await refreshWorkspace(wikiRoot)).documents.length, 1);
 const mirrorPath = resolve('mirror');
 await mkdir(mirrorPath);
 const path = 'literal café %20#[a].md';

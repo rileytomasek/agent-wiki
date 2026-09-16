@@ -33,7 +33,7 @@ YAML frontmatter is optional. All supported fields are optional and available on
 | `participants` | List of relative paths to Markdown documents    | People or organizations participating in the described event or activity.                                       |
 | `location`     | Relative path to a Markdown document            | Place where the described thing is located or occurs.                                                           |
 
-- Document references in `about`, `authors`, `participants`, and `location` resolve relative to the containing document. Do not mix plain names and paths; unlinked names belong in the body.
+- Document references in `about`, `authors`, `participants`, and `location` are literal relative `.md` paths resolved from the containing document. URI escapes are decoded in Markdown link destinations, but not in these YAML path values. Section fragments belong in Markdown links. Do not mix plain names and paths; unlinked names belong in the body.
 - Dates use valid `YYYY-MM-DD` calendar dates or, where permitted, ISO timestamps with an explicit UTC offset or `Z`, such as `2026-09-15T14:00:00-04:00`. Preserve known precision; do not invent a time for a date-only value.
 - Singular contact fields describe primary contact information. Additional contact details belong in the body.
 - Fields describe the document or its subject, not filesystem activity. Editing a book note does not change the book's `published_at`.

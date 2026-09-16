@@ -37,10 +37,20 @@
     "prepare": "node scripts/install-hooks.ts"
   },
   "dependencies": {
-    "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+    "@tobilu/qmd": "git+https://github.com/tobi/qmd.git#04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+    "github-slugger": "2.0.0",
+    "mdast-util-from-markdown": "2.0.2",
+    "mdast-util-frontmatter": "2.0.1",
+    "mdast-util-gfm": "3.1.0",
+    "mdast-util-to-string": "4.0.0",
+    "micromark-extension-frontmatter": "2.0.0",
+    "micromark-extension-gfm": "3.0.0",
+    "micromark-util-decode-string": "2.0.1",
+    "yaml": "2.8.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "7.6.13",
+    "@types/mdast": "4.0.4",
     "@types/node": "22.20.2",
     "fast-check": "4.10.0",
     "husky": "9.1.7",
