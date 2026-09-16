@@ -130,6 +130,43 @@ test('a failed QMD update cannot declare a changed selection current even when i
   });
 });
 
+test('failed mirror writes during a scope change preserve the previous SQLite snapshot until retry', async () => {
+  await inWorkspace(async (fixture) => {
+    await fixture.write('records/one.md', '# Record\n\nOrchid original.\n');
+    await fixture.write('docs/guide.md', '# Guide\n\nAmber replacement.\n');
+    const first = await indexWiki(fixture.root, {
+      selections: ['records'],
+      embed: deferEmbeddings,
+    });
+    const blocker = join(indexPaths(fixture.root).mirrorPath, 'docs');
+    await writeFile(blocker, 'Blocks the new mirror directory');
+    const failed = await indexWiki(fixture.root, {
+      selections: ['docs'],
+      embed: deferEmbeddings,
+    });
+    expect(failed).toMatchObject({ complete: false, update: null });
+    expect(failed.state.baseline).toEqual(first.state.baseline);
+    expect(failed.state.coverage.complete).toBe(false);
+    expect(
+      failed.diagnostics.some((problem) => problem.code === 'index.mirror')
+    ).toBe(true);
+    expect((await indexStatus(fixture.root)).currency).toBe('unknown');
+    expect((await indexedHits(fixture.root, 'orchid'))[0]?.path).toBe(
+      'records/one.md'
+    );
+    expect(await indexedHits(fixture.root, 'amber')).toEqual([]);
+    await rm(blocker);
+    const retry = await indexWiki(fixture.root, { embed: deferEmbeddings });
+    expect(retry.update).toMatchObject({ indexed: 1, removed: 1 });
+    expect(retry.state.baseline?.selections).toEqual(['docs']);
+    expect((await indexStatus(fixture.root)).currency).toBe('current');
+    expect(await indexedHits(fixture.root, 'orchid')).toEqual([]);
+    expect((await indexedHits(fixture.root, 'amber'))[0]?.path).toBe(
+      'docs/guide.md'
+    );
+  });
+});
+
 test.each(stateFailures)(
   '$name saved selection cannot silently widen the existing index',
   async ({ replace }) => {

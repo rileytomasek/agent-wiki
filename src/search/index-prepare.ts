@@ -50,9 +50,9 @@ export async function prepareIndex(
     coverage: mirror.coverage,
     diagnostics: mirror.diagnostics,
   };
-  if (!mirror.safeToUpdate)
+  if (!mirror.safeToUpdate || (changedScope && !mirror.coverage.complete))
     throw new Error(
-      'The index could not safely reconcile incomplete source coverage'
+      'The index could not safely reconcile the selected mirror; QMD update was not run'
     );
   return prepared.sources;
 }

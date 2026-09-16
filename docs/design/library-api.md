@@ -117,8 +117,9 @@ stale. Failed reads or scans affecting selected paths remain incomplete.
 The requested selections and the successful text baseline's selections are
 recorded separately. Changing selection requires complete selected-source and
 projection coverage before reconciling the mirror. A failed scope change retains
-the prior index and cannot claim current currency; the next explicit index retries
-the saved request. Missing or corrupt selection state beside an existing index
+the prior successful text baseline and cannot claim current currency. Incomplete
+mirror reconciliation prevents a QMD update during a scope change; the next explicit
+index retries the saved request. Missing or corrupt selection state beside an existing index
 requires explicit `indexWiki` selections rather than silently widening its scope.
 Version-one state migrates as a whole-root selection; new state uses version two.
 
