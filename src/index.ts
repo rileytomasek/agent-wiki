@@ -56,3 +56,18 @@ export type {
   ListResult,
   ShowResult,
 } from './operations/types.ts';
+export { indexWiki } from './search/index.ts';
+export { indexStatus } from './search/status.ts';
+export type {
+  IndexOptions,
+  IndexResult,
+  IndexStatusResult,
+  IndexState,
+  IndexCoverage,
+  IndexRun,
+  IndexStage,
+  IndexVersions,
+  SourceFingerprint,
+  SourceChanges,
+  TextBaseline,
+} from './search/index-types.ts';

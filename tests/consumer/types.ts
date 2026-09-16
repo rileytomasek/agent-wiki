@@ -1,10 +1,17 @@
 import type {
   DocumentSnapshot,
+  IndexResult,
   MetadataFilter,
   SearchHit,
   SearchStore,
   WikiFrontmatter,
 } from 'agent-wiki';
+
+export function indexTypes(result: IndexResult): number | undefined {
+  // @ts-expect-error -- Index operational results are immutable to consumers.
+  result.state.coverage.complete = false;
+  return result.state.qmd?.needsEmbedding;
+}
 
 export function documentTypes(snapshot: DocumentSnapshot): WikiFrontmatter {
   // @ts-expect-error -- Normalized document identities are immutable to consumers.

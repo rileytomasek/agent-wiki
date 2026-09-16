@@ -72,10 +72,10 @@ has a process-local configuration source, the tested update/search/status paths
 read each database's collection records. Interleaving stores and closing one does
 not redirect another store.
 
-The adapter is an integration baseline. Workspace projection, index locking,
-partial-source diagnostics, freshness notices, and command behavior are defined
-in the design and implemented in subsequent issues. QMD aggregate counts alone
-do not establish complete indexing of an authored wiki.
+The workspace coordinator provides deterministic metadata projection, exclusive
+index locking, partial-source preservation, and explicit index/status commands.
+QMD aggregate counts alone do not establish complete indexing of an authored
+wiki; source coverage and text/embedding stages remain separately recorded.
 
 ## Verification
 

@@ -75,7 +75,7 @@ export function renderShow(result: ShowResult, json: boolean): CliResult {
   return rendered(result, json ? JSON.stringify(result) : content, json);
 }
 
-function rendered(
+export function rendered(
   result: {
     readonly diagnostics: readonly Diagnostic[];
     readonly complete: boolean;

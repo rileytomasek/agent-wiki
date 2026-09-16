@@ -25,6 +25,15 @@ const descriptions: Readonly<Record<string, readonly string[]>> = {
     '  --stale             Review queue: due today or earlier',
     '  --limit <number>    Positive document limit (default: unlimited)',
   ],
+  index: [
+    'index [--rebuild]',
+    'Explicitly update the search index and generate missing embeddings.',
+    '  --rebuild  Recreate search-derived state from readable source files',
+  ],
+  status: [
+    'status',
+    'Inspect index availability, source currency, and recorded coverage without models.',
+  ],
 };
 
 export function help(command?: string): string {
@@ -48,8 +57,8 @@ export function help(command?: string): string {
     '  -v, --version       Show version',
     '',
     ...(details?.slice(1) ?? [
-      'Available commands: show, list.',
-      'Planned commands: search, related, validate, index, status, move.',
+      'Available commands: show, list, index, status.',
+      'Planned commands: search, related, validate, move.',
     ]),
   ].join('\n');
 }

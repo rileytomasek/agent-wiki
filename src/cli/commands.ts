@@ -8,6 +8,7 @@ import {
   rejectFilters,
   requireOperands,
 } from './command-options.ts';
+import { executeIndexCommand } from './index-commands.ts';
 import { renderList, renderShow } from './output.ts';
 import type { CliResult } from './output.ts';
 
@@ -17,6 +18,17 @@ export interface CliContext {
 }
 
 export async function executeCommand(
+  args: Arguments,
+  context: CliContext
+): Promise<CliResult> {
+  if (args.rebuild && args.command !== 'index')
+    throw new Error(`--rebuild is not supported by ${args.command}`);
+  if (args.command === 'index' || args.command === 'status')
+    return executeIndexCommand(args, context);
+  return executeReadCommand(args, context);
+}
+
+async function executeReadCommand(
   args: Arguments,
   context: CliContext
 ): Promise<CliResult> {

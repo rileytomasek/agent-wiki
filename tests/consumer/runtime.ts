@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 
 import {
   hashSource,
+  indexStatus,
   listDocuments,
   openSearchStore,
   parseDocument,
@@ -35,6 +36,7 @@ assert.equal(
   'notes.md'
 );
 assert.equal((await showDocument(wikiRoot, 'notes.md')).content, source);
+assert.equal((await indexStatus(wikiRoot)).availability, 'absent');
 const mirrorPath = resolve('mirror');
 await mkdir(mirrorPath);
 const path = 'literal café %20#[a].md';
