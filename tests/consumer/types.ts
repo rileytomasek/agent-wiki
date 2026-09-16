@@ -1,4 +1,21 @@
-import type { MetadataFilter, SearchHit, SearchStore } from 'agent-wiki';
+import type {
+  DocumentSnapshot,
+  MetadataFilter,
+  SearchHit,
+  SearchStore,
+  WikiFrontmatter,
+} from 'agent-wiki';
+
+export function documentTypes(snapshot: DocumentSnapshot): WikiFrontmatter {
+  // @ts-expect-error -- Normalized document identities are immutable to consumers.
+  snapshot.document.path = 'other.md';
+  const invalid: WikiFrontmatter = {
+    // @ts-expect-error -- Authored metadata uses the closed shared schema.
+    custom_status: 'active',
+  };
+  void invalid;
+  return snapshot.document.metadata;
+}
 
 export function publicTypes(
   store: SearchStore,
