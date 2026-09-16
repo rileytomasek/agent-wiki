@@ -109,6 +109,12 @@ artifact under the same version is an error requiring a new version. Registry
 failures are not treated as absence. Record the release tag, package links, and
 checks in the issue/PR rather than a second local status file.
 
+npm can acknowledge publication before package-name lookups expose the version.
+The workflow waits for that metadata with bounded read-only retries before
+installing consumers. This never retries publication; the job still fails if the
+registry does not become ready. A later workflow rerun checks artifact integrity
+before continuing verification.
+
 The manual `qmd-snapshot.yml` workflow rebuilds the pinned snapshot and verifies
 it through fresh npm/Bun Agent Wiki consumers before publishing. For a new
 snapshot, publish and verify it before switching Agent Wiki's dependency/lock;
