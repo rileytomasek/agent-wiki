@@ -42,7 +42,7 @@ async function prepareConsumer(directory: string, artifact: string) {
     })
   );
   await Promise.all(
-    ['runtime.ts', 'types.ts'].map((file) =>
+    ['runtime.ts', 'types.ts', 'cli.ts', 'workflows.ts'].map((file) =>
       copyFile(resolve('tests/consumer', file), join(directory, file))
     )
   );
@@ -81,40 +81,15 @@ async function verify(directory: string) {
     }),
     ''
   );
-  console.log(
-    run(process.execPath, ['runtime.ts'], { cwd: directory, env }).trim()
-  );
+  for (const file of ['runtime.ts', 'cli.ts', 'workflows.ts']) {
+    console.log(run(process.execPath, [file], { cwd: directory, env }).trim());
+  }
   const cli = join(directory, 'node_modules/.bin/wiki');
   assert.match(run(cli, ['--help'], { cwd: directory, env }), /Usage: wiki/u);
   assert.match(
     run(cli, ['--version'], { cwd: directory, env }),
     /^0\.0\.0\n$/u
   );
-  assert.match(
-    run(cli, ['--root', join(directory, 'wiki'), 'show', 'notes.md'], {
-      cwd: directory,
-      env,
-    }),
-    /Readable content/u
-  );
-  const listing: unknown = JSON.parse(
-    run(
-      cli,
-      [
-        'list',
-        '--root',
-        join(directory, 'wiki'),
-        '--type',
-        'doc/guide',
-        '--json',
-      ],
-      { cwd: directory, env }
-    )
-  );
-  assert.ok(
-    typeof listing === 'object' && listing !== null && 'total' in listing
-  );
-  assert.equal(listing.total, 1);
   await assert.rejects(lstat(join(directory, 'node_modules/husky')), {
     code: 'ENOENT',
   });

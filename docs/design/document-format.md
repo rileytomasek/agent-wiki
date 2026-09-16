@@ -1,6 +1,6 @@
 # Document Format
 
-Agreed Markdown document format. This specifies authoring and validation, not an implemented tool.
+The Markdown authoring and validation contract used by Agent Wiki.
 
 See the [CLI functional spec](cli-spec.md), [architecture](architecture.md), and [repository setup and code-quality decisions](../contributing/tooling.md) for the tool that maintains and searches these files.
 

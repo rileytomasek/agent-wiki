@@ -53,6 +53,23 @@ Node/npm consumer and needs access to dependency sources. It does not publish.
 
 ## For wiki authors
 
+### Install a local build
+
+After the development setup builds the package, create and install a tarball:
+
+```sh
+npm pack --ignore-scripts
+npm install --global ./agent-wiki-0.0.0.tgz
+wiki --help
+wiki show guides/deployment.md --root /path/to/your/wiki
+```
+
+The installed package supports Node `^22.22.1` or `^24.21.0`, and needs
+access to its npm/Git dependencies during installation. It does not require Bun
+or development hooks. This repository has not published a package to npm.
+QMD's first index/search operation that needs models can download roughly 2.1 GB;
+current-file inspection and validation work without those models.
+
 - [Authoring guide](docs/user/authoring.md): write and connect documents.
 - [Type examples](docs/user/type-examples.md): choose useful descriptive labels.
 - [Example wiki](examples/wiki/README.md): a small, connected, fictional corpus.
@@ -60,7 +77,9 @@ Node/npm consumer and needs access to dependency sources. It does not publish.
   content contract.
 
 Start with the [command guide](docs/user/commands.md) for inspection, review,
-search indexing, and safe document moves.
+search indexing, and safe document moves. See [verification and implementation
+decisions](docs/contributing/verification.md) for tests, benchmarks, and remaining
+operational limits.
 
 ## For contributors
 

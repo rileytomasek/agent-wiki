@@ -1,6 +1,6 @@
 # Agent Wiki CLI
 
-Functional specification for a local CLI operating on the [Agent Wiki format](document-format.md). `wiki` is the proposed executable name.
+Functional specification for the `wiki` CLI operating on the [Agent Wiki format](document-format.md).
 
 See the [architecture](architecture.md) for component boundaries, data models, and indexing; the [implementation plan](implementation-plan.md) describes the technical sequence.
 

@@ -1,5 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
 
 import { indexWiki } from '../src/search/index.ts';
 import { indexStatus } from '../src/search/status.ts';
@@ -23,37 +24,19 @@ const documents: Readonly<Record<string, string>> = {
     'Music practice. Learn piano chords and scales with a metronome. Keep a steady rhythm while playing.',
 };
 
-await inWorkspace(async (fixture) => {
-  await Promise.all(
-    Object.entries(documents).map(([path, body]) =>
-      fixture.write(path, `---\ntype: doc/guide\n---\n# ${path}\n\n${body}\n`)
-    )
-  );
-  const indexed = await indexWiki(fixture.root);
-  assert.equal(indexed.complete, true);
-  assert.equal(indexed.embedding?.errors, 0);
-  assert.equal(indexed.embedding.docsProcessed, 3);
-  const status = await indexStatus(fixture.root);
-  assert.equal(status.status, 'current');
-  assert.equal(status.pendingEmbeddings, 0);
+function command(root: string, args: readonly string[]) {
+  const start = performance.now();
   const result = readJson(
     run(
       process.execPath,
-      [
-        resolve('src/cli/bin.ts'),
-        'search',
-        'protect flowering plants during freezing weather',
-        '--root',
-        fixture.root,
-        '--type',
-        'doc/guide',
-        '--limit',
-        '2',
-        '--json',
-      ],
-      { cwd: fixture.root }
+      [resolve('src/cli/bin.ts'), ...args, '--root', root, '--json'],
+      { cwd: root }
     )
   );
+  return { result, milliseconds: Math.round(performance.now() - start) };
+}
+
+function assertSearch(result: Readonly<Record<string, unknown>>): void {
   const hits = readObjects(result['documents']);
   const first = readObject(hits[0]);
   assert.equal(first['path'], gardenPath);
@@ -68,9 +51,43 @@ await inWorkspace(async (fixture) => {
   assert.equal(result['total'], null);
   assert.equal(result['truncated'], null);
   assert.equal(result['complete'], true);
+}
+
+await inWorkspace(async (fixture) => {
+  await Promise.all(
+    Object.entries(documents).map(([path, body]) =>
+      fixture.write(path, `---\ntype: doc/guide\n---\n# ${path}\n\n${body}\n`)
+    )
+  );
+  const indexed = command(fixture.root, ['index']);
+  assert.equal(indexed.result['complete'], true);
+  assert.equal(readObject(indexed.result['embedding'])['errors'], 0);
+  assert.equal(readObject(indexed.result['embedding'])['docsProcessed'], 3);
+  const repeated = await indexWiki(fixture.root);
+  assert.equal(repeated.complete, true);
+  assert.equal(repeated.embedding?.docsProcessed, 0);
+  const status = await indexStatus(fixture.root);
+  assert.equal(status.status, 'current');
+  assert.equal(status.pendingEmbeddings, 0);
+  const search = command(fixture.root, [
+    'search',
+    'protect flowering plants during freezing weather',
+    '--type',
+    'doc/guide',
+    '--limit',
+    '2',
+  ]);
+  assertSearch(search.result);
   console.log(
     JSON.stringify(
-      { node: process.version, indexed, status, search: result },
+      {
+        node: process.version,
+        models: 'cached local models; process startup included',
+        indexed,
+        repeated,
+        status,
+        search,
+      },
       null,
       2
     )

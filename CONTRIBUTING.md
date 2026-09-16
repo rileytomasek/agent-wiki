@@ -34,6 +34,10 @@ minimum runtime locally. CI covers both supported runtime versions on Linux and
 macOS. Required-check configuration depends on the remote account's repository
 capabilities; a passing workflow alone does not enforce branch protection.
 
+Run `mise exec -- bun run benchmark` separately to measure representative
+current-file and text-index operations. The [verification guide](docs/contributing/verification.md)
+maps conformance scenarios to executable tests and records the measurement method.
+
 1. Inspect the checkout and preserve unrelated changes. Use an isolated worktree
    for concurrent implementation.
 2. Implement a cohesive behavior with its tests. Use real temporary files and QMD
