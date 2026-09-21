@@ -4,6 +4,7 @@ import type {
   MetadataFilter,
   MoveResult,
   SearchHit,
+  SearchMode,
   SearchStore,
   ReferenceOccurrence,
   RelatedResult,
@@ -77,5 +78,6 @@ export function publicTypes(
     value: 'doc',
   };
   void invalid;
-  return store.searchLex(hit.path, { filter, limit: 5 });
+  const mode: SearchMode = 'semantic';
+  return store.search(hit.path, { mode, filter, limit: 5 });
 }

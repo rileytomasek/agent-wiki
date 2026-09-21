@@ -6,7 +6,11 @@ export interface StorePaths {
   readonly mirrorPath: string;
 }
 
+export type SearchMode = 'keyword' | 'semantic' | 'hybrid';
+
 export interface SearchOptions {
+  /** Defaults to hybrid. Semantic skips expansion and reranking. */
+  readonly mode?: SearchMode;
   readonly filter?: MetadataFilter;
   readonly limit?: number;
 }

@@ -130,6 +130,16 @@ in a test data directory, not the valid example wiki.
 | M09      | Index/move overlap.                                                               | Serialize through the workspace lock; handle interruption/recovery without silent lock bypass.                                       |
 | M10      | Successful move followed by reads/search.                                         | Current graph/cache reflect the move; search remains an indexed snapshot with one currency notice until reindexed.                   |
 
+## Library search modes
+
+- Keyword mode uses native lexical retrieval without model inference.
+- Semantic mode embeds the original query and uses native lexical/vector fusion;
+  expansion and reranking are never called. CR/LF become spaces, punctuation is
+  preserved, and unsupported native syntax fails explicitly.
+- Hybrid mode and omitted mode preserve the full native pipeline and CLI behavior.
+- Every mode preserves filters, limits, snippets, index notices, and borrowed-store
+  ownership. Invalid modes cannot silently start hybrid inference.
+
 ## CLI and package
 
 | Scenario | Input or action                                                                   | Expected result                                                                                                                     |

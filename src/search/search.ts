@@ -1,9 +1,8 @@
 import { invocationDate, reviewStatus } from '../documents/dates.ts';
 import { OperationError } from '../operations/errors.ts';
-import { resultLimit } from '../operations/results.ts';
 import { indexPaths } from './index-paths.ts';
 import { openSearchStore } from './qmd.ts';
-import { searchFilter } from './query-filters.ts';
+import { nativeOptions } from './query-options.ts';
 import type {
   SearchDocument,
   WikiSearchOptions,
@@ -12,19 +11,6 @@ import type {
 import { indexNotice, requireIndex } from './recovery.ts';
 import { indexStatus } from './status.ts';
 import type { SearchHit, SearchOptions } from './types.ts';
-
-function nativeOptions(
-  options: WikiSearchOptions,
-  today: string
-): SearchOptions {
-  const filter = searchFilter(options.filters, today);
-  const limit =
-    options.limit === undefined ? undefined : resultLimit(options.limit);
-  return {
-    ...(filter === undefined ? {} : { filter }),
-    ...(limit === undefined ? {} : { limit }),
-  };
-}
 
 function searchDocument(hit: SearchHit, today: string): SearchDocument {
   const deadline = hit.metadata['stale_after'];

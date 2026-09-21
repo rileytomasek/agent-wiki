@@ -71,6 +71,22 @@ try {
   );
   assert.equal(repeated.documents[0]?.path, gardenPath);
   assert.equal(repeated.indexNotice, null);
+  await (['keyword', 'semantic', 'hybrid'] as const).reduce(
+    async (previous, mode) => {
+      await previous;
+      const explicit = await searchWiki(root, 'Orchid winter care', {
+        store,
+        mode,
+        filters: { type: 'doc/guide' },
+        limit: 2,
+      });
+      assert.equal(explicit.documents[0]?.path, gardenPath);
+      assert.equal(explicit.indexNotice, null);
+      assert.ok(explicit.documents.length <= 2);
+      assert.equal(explicit.documents[0].snippet.source, 'index');
+    },
+    Promise.resolve()
+  );
 } finally {
   await store.close();
 }

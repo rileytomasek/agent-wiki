@@ -252,6 +252,12 @@ Do not add indexing timestamps or a computed `stale` boolean to generated conten
 
 ### Search and filters
 
+Library callers can select `keyword` (lexical only), `semantic` (native fusion
+of original-query lexical/vector retrieval without expansion or reranking), or
+`hybrid` (the full native pipeline). Hybrid remains the library and CLI default.
+The adapter uses QMD's structured-query API for semantic mode rather than
+implementing another ranking layer. See the [library contract](library-api.md#snapshot-search).
+
 Use QMD's search pipeline and candidate limits. The adapter maps wiki flags to native metadata filters:
 
 | Wiki filter                      | QMD condition                                                                             |

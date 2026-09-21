@@ -156,12 +156,28 @@ lock takeover. Release verifies that ownership has not changed.
 
 ## Snapshot search
 
-`searchWiki(root, query, { filters?, limit?, clock?, store?, search? })` uses QMD's
+`searchWiki(root, query, { mode?, filters?, limit?, clock?, store?, search? })` uses QMD's
 native hybrid search by default. Exact type/category/name/about and review
 deadline filters combine with AND. QMD owns candidate selection, ranking,
 chunking, and the default result limit. The optional `search` callback is an
 integration seam for deterministic offline tests using the same store's lexical
 search; it is not a second retrieval engine.
+
+The public `SearchMode` is `keyword | semantic | hybrid`. Omission preserves
+`hybrid`, including the unchanged CLI default. `keyword` uses native lexical
+retrieval without inference. `semantic` supplies the original query as both
+lexical and vector input to QMD structured search, with expansion and reranking
+skipped. `hybrid` retains QMD's automatic expansion, retrieval, and reranking.
+Filters, limits, native scores/snippets, and index notices apply to every mode.
+Scores are mode-specific ranking values, not comparable confidence estimates.
+
+Semantic queries fold line breaks to spaces for QMD's single-line API; other
+text is preserved. QMD requires balanced double quotes and rejects `-term`
+exclusions in vector queries. Use keyword mode for exclusions. Native errors
+remain explicit; no query rewriting, fallback, or automatic escalation occurs.
+The optional `search` callback overrides normal mode routing for integrations.
+`SearchStore.search(query, { mode? })` supports the same modes; `searchLex` always
+performs lexical search.
 
 Long-running callers can reuse an open store. `indexPaths(root)` returns the
 absolute paths for that root's dedicated store and derived files. Pass a store
@@ -180,10 +196,13 @@ import {
 
 const store = await openSearchStore(indexPaths(root));
 try {
-  const semantic = await searchWiki(root, 'winter plant care', { store });
+  const semantic = await searchWiki(root, 'winter plant care', {
+    store,
+    mode: 'semantic',
+  });
   const keyword = await searchWiki(root, 'orchid', {
     store,
-    search: (opened, query, options) => opened.searchLex(query, options),
+    mode: 'keyword',
   });
 } finally {
   await store.close();

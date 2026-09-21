@@ -11,6 +11,7 @@ import {
 } from '../tests/fixtures/read-cli.ts';
 import { inWorkspace } from '../tests/fixtures/workspace.ts';
 import { run } from './process.ts';
+import { proveSearchModes } from './qmd-mode-proof.ts';
 
 // Keep downloads reusable but separate from the user's QMD installation.
 process.env['XDG_CACHE_HOME'] = resolve('.cache/model-smoke');
@@ -78,6 +79,7 @@ await inWorkspace(async (fixture) => {
     '2',
   ]);
   assertSearch(search.result);
+  await proveSearchModes(fixture.root);
   console.log(
     JSON.stringify(
       {
