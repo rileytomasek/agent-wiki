@@ -40,7 +40,7 @@ no consumer should import the snapshot directly or require a custom adapter.
 
 `openSearchStore` loads QMD lazily and accepts absolute `dbPath` and `mirrorPath`.
 It supplies one inline `wiki` collection with `**/*.md`. It exposes only public
-SDK operations: complete update, embedding, native filtered lexical/hybrid search,
+SDK operations: complete update, embedding, native filtered keyword/semantic/hybrid search,
 status, and close. It never reads private database tables or edits QMD's global
 configuration file. The public declarations use repository-owned immutable types.
 Importing Agent Wiki or running help/version does not open SQLite or load models.
@@ -86,6 +86,23 @@ with an indexed-content label; it does not turn generated positions into exact
 original-source lines. Titles, metadata, and review deadlines come from the
 snapshot, even when current files have changed or moved. Search totals and
 truncation are unknown rather than inferred from a bounded result window.
+
+## Search modes
+
+The adapter uses only the pinned public SDK. `keyword` calls `searchLex`;
+`semantic` calls `search` with the original query as both `lex` and `vec` entries
+in `queries`, plus `rerank: false`; `hybrid` calls `search({ query })` with native
+defaults. Structured queries bypass expansion. QMD owns fusion weights, candidate
+selection, chunking, and scores. No manual merging or private-table access is
+introduced. Agent Wiki and CLI defaults remain hybrid; embedding applications
+can select a different default explicitly.
+
+Semantic input folds CR/LF to spaces, preserving the query otherwise. QMD's
+balanced-quote and vector-negation validation stays authoritative. Unknown mode
+values fail instead of silently selecting expensive inference. The model proof
+observes native inference calls: keyword invokes none, semantic embeds but
+cannot invoke expansion/reranking, and hybrid invokes the existing reranker.
+The observation uses native internals only in verification, not shipped code.
 
 ## Verification
 

@@ -38,6 +38,9 @@ cleanup. `indexWiki(root)` coordinates source refresh, projection, text updates,
 and missing embeddings; `indexStatus(root)` inspects source currency and recorded
 coverage without loading QMD or models. `searchWiki(root, query)` searches that
 snapshot with QMD's native hybrid ranking, filters, scores, and snippets.
+Pass `{ mode: 'keyword' }` for lexical matching or `{ mode: 'semantic' }` for
+original-query lexical/vector retrieval without expansion or reranking. The
+full pipeline is `{ mode: 'hybrid' }`, which remains the default.
 See the [QMD integration contract](docs/design/references/qmd-integration.md).
 
 Library callers can index a subset with

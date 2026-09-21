@@ -3,11 +3,18 @@ import type { Diagnostic } from '../documents/types.ts';
 import type { DocumentFilters } from '../operations/types.ts';
 import type { IndexStatusResult } from './index-types.ts';
 import type { Metadata } from './metadata.ts';
-import type { SearchHit, SearchOptions, SearchStore } from './types.ts';
+import type {
+  SearchHit,
+  SearchMode,
+  SearchOptions,
+  SearchStore,
+} from './types.ts';
 
 export type SearchFilters = Omit<DocumentFilters, 'path'>;
 
 export interface WikiSearchOptions {
+  /** Defaults to hybrid; keyword is lexical and semantic omits expansion/reranking. */
+  readonly mode?: SearchMode;
   readonly filters?: SearchFilters;
   readonly limit?: number;
   readonly clock?: Clock;

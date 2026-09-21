@@ -3,6 +3,7 @@ import { isAbsolute } from 'node:path';
 import type { extractSnippet } from '@tobilu/qmd';
 
 import type { Metadata } from './metadata.ts';
+import { qmdSearch } from './qmd-search.ts';
 import type { SearchHit, SearchStore, StorePaths } from './types.ts';
 
 interface NativeHit {
@@ -67,7 +68,7 @@ export async function openSearchStore(paths: StorePaths): Promise<SearchStore> {
       return hits.map((hit) => mapHit(hit, query, snippet));
     },
     search: async (query, options) => {
-      const hits = await store.search({ query, ...options });
+      const hits = await qmdSearch(store, query, options);
       return hits.map((hit) => mapHit(hit, query, snippet));
     },
     status: () => store.getStatus(),

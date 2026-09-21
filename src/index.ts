@@ -12,6 +12,7 @@ export type {
 export type {
   EmbeddingResult,
   SearchHit,
+  SearchMode,
   SearchOptions,
   SearchStatus,
   SearchStore,
